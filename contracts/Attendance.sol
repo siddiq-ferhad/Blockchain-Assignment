@@ -12,7 +12,6 @@ contract Attendance {
     uint256 public studentCounter;
     uint256 public teacherCounter;
 
-
     struct Student {
         uint256 studentId;
         string name;
@@ -39,14 +38,10 @@ contract Attendance {
 
     }
 
-
-
     mapping(address => Student) public studentDetails;
     mapping(address => Teacher) public teacherDetails;
     mapping(uint256 => Subject) public subjectDetails;
     mapping(uint256 => Class) public classDetails;
-
-
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
@@ -93,7 +88,6 @@ contract Attendance {
         newSubject.subjectId=subjectCounter;
         newSubject.subjectName = _subjectName;
     }
-
 
     function createClass(uint256 _classDate, uint256 _subjectId) public onlyOwner {
         classCounter++;
