@@ -43,6 +43,8 @@ contract Attendance {
     mapping(uint256 => Subject) public subjectDetails;
     mapping(uint256 => Class) public classDetails;
 
+    event StudentEnrolled(uint256 indexed subjectId, address indexed student);
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
@@ -101,6 +103,9 @@ contract Attendance {
 
     function enrollStudent(uint256 _subjectId, address _student) public onlyOwner {
         subjectDetails[_subjectId].enrolledStudents.push(studentDetails[_student]);
+
+        // Debug logging (only for testing purposes)
+        emit StudentEnrolled(_subjectId, _student);
     }
 
     function assignTeacher(uint256 _subjectId, address _teacher) public onlyOwner {
