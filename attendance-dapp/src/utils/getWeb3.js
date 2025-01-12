@@ -1,6 +1,6 @@
 import Web3 from "web3";
 
-const getWeb3 = () =>
+const getWeb3 = () => 
   new Promise((resolve, reject) => {
     window.addEventListener("load", async () => {
       if (window.ethereum) {
@@ -11,10 +11,8 @@ const getWeb3 = () =>
         } catch (error) {
           reject(error);
         }
-      } else if (window.web3) {
-        resolve(new Web3(window.web3.currentProvider));
       } else {
-        reject(new Error("Must install MetaMask"));
+        reject(new Error("Metamask not found. Please install it."));
       }
     });
   });

@@ -1,96 +1,96 @@
 const Attendance = artifacts.require("Attendance");
-const truffleAssert = require("truffle-assertions");
 
 contract("Attendance", (accounts) => {
-    const [owner, teacher, student, otherAccount] = accounts;
+    let attendanceInstance;
 
-    beforeEach(async () => {
-        this.attendance = await Attendance.new({ from: owner });
+    before(async () => {
+        attendanceInstance = await Attendance.deployed();
     });
 
-    it("should set the contract owner correctly", async () => {
-        const contractOwner = await this.attendance.owner();
-        assert.equal(contractOwner, owner, "Owner is not set correctly");
+    it("should add a new student", async () => {
+        const studentAddress = accounts[1];
+        const studentName = "John Doe";
+        await attendanceInstance.addStudent(studentAddress, studentName, { from: accounts[0] });
+
+        const student = await attendanceInstance.studentDetails(studentAddress);
+        assert.equal(student.name, studentName, "Student name is incorrect");
+        assert.equal(student.studentId.toNumber(), 1, "Student ID is incorrect");
     });
 
-    it("should allow the owner to add a student", async () => {
-        await this.attendance.addStudent(student, "John Doe", { from: owner });
-        const studentDetails = await this.attendance.studentDetails(student);
-        assert.equal(studentDetails.name, "John Doe", "Student name is incorrect");
-        assert.equal(studentDetails.studentId.toNumber(), 1, "Student ID is incorrect");
+    it("should add a new teacher", async () => {
+        const teacherAddress = accounts[2];
+        const teacherName = "Jane Smith";
+        await attendanceInstance.addTeacher(teacherAddress, teacherName, { from: accounts[0] });
+
+        const teacher = await attendanceInstance.teacherDetails(teacherAddress);
+        assert.equal(teacher.name, teacherName, "Teacher name is incorrect");
+        assert.equal(teacher.teacherId.toNumber(), 1, "Teacher ID is incorrect");
     });
 
-    it("should allow the owner to add a teacher", async () => {
-        await this.attendance.addTeacher(teacher, "Dr. Smith", { from: owner });
-        const teacherDetails = await this.attendance.teacherDetails(teacher);
-        assert.equal(teacherDetails.name, "Dr. Smith", "Teacher name is incorrect");
-        assert.equal(teacherDetails.teacherId.toNumber(), 1, "Teacher ID is incorrect");
+    it("should create a new subject", async () => {
+        const subjectName = "Blockchain 101";
+        await attendanceInstance.createSubject(subjectName, { from: accounts[0] });
+
+        const subject = await attendanceInstance.subjectDetails(1);
+        assert.equal(subject.subjectName, subjectName, "Subject name is incorrect");
+        assert.equal(subject.subjectId.toNumber(), 1, "Subject ID is incorrect");
     });
 
-    it("should allow the owner to create a subject", async () => {
-        await this.attendance.createSubject("Mathematics", { from: owner });
-        const subject = await this.attendance.subjectDetails(1);
-        assert.equal(subject.subjectName, "Mathematics", "Subject name is incorrect");
-    });
-
-    it("should allow the owner to create a class", async () => {
-        await this.attendance.createSubject("Mathematics", { from: owner });
-        await this.attendance.createClass(1672531200, 1, { from: owner }); // Timestamp example
-        const classDetails = await this.attendance.classDetails(1);
-        assert.equal(classDetails.classId.toNumber(), 1, "Class ID is incorrect");
-        assert.equal(classDetails.classDate.toNumber(), 1672531200, "Class date is incorrect");
-    });
-
-    it("should allow the owner to enroll a student in a subject", async () => {
-        await this.attendance.createSubject("Mathematics", { from: owner });
-        await this.attendance.addStudent(student, "John Doe", { from: owner });
+    it("should enroll a student in a subject", async () => {
+        const subjectId = 1;
+        const studentAddress = accounts[1];
+        await attendanceInstance.enrollStudent(subjectId, studentAddress, { from: accounts[0] });
     
-        // Call enrollStudent and listen for the event
-        const result = await this.attendance.enrollStudent(1, student, { from: owner });
+        const enrolledStudentIds = await attendanceInstance.getEnrolledStudents(subjectId);
+        assert.equal(enrolledStudentIds.length, 1, "No students enrolled in the subject");
+        assert.equal(enrolledStudentIds[0].toNumber(), 1, "Enrolled student ID is incorrect");
+    });
     
-        // Verify the event was emitted
-        truffleAssert.eventEmitted(result, "StudentEnrolled", (ev) => {
-            return ev.subjectId.toNumber() === 1 && ev.student === student;
-        });
+    it("should assign a teacher to a subject", async () => {
+        const subjectId = 1;
+        const teacherAddress = accounts[2];
+        await attendanceInstance.assignTeacher(subjectId, teacherAddress, { from: accounts[0] });
     
-        // Optional: Further validate that the student was added correctly
-        const subject = await this.attendance.subjectDetails(1);
-        const enrolledStudent = await this.attendance.studentDetails(student);
-        assert.equal(enrolledStudent.name, "John Doe", "Enrolled student name is incorrect");
+        const teachingTeacherIds = await attendanceInstance.getTeachingTeachers(subjectId);
+        assert.equal(teachingTeacherIds.length, 1, "No teachers assigned to the subject");
+        assert.equal(teachingTeacherIds[0].toNumber(), 1, "Assigned teacher ID is incorrect");
     });    
 
+    it("should create a new class", async () => {
+        const classDate = Math.floor(Date.now() / 1000); // Current timestamp
+        const subjectId = 1;
+        await attendanceInstance.createClass(classDate, subjectId, { from: accounts[0] });
+
+        const createdClass = await attendanceInstance.classDetails(1);
+        assert.equal(createdClass.classId.toNumber(), 1, "Class ID is incorrect");
+        assert.equal(createdClass.classDate.toNumber(), classDate, "Class date is incorrect");
+    });
+
     it("should allow a student to mark attendance", async () => {
-        await this.attendance.createSubject("Mathematics", { from: owner });
-        await this.attendance.createClass(1672531200, 1, { from: owner });
-        await this.attendance.addStudent(student, "John Doe", { from: owner });
-        await this.attendance.enrollStudent(1, student, { from: owner });
+        const classId = 1;
+        await attendanceInstance.markAttendance(classId, { from: accounts[1] });
 
-        await this.attendance.markAttendance(1, { from: student });
-        const isPresent = await this.attendance.checkAttendance(1, { from: student });
-        assert.isTrue(isPresent, "Attendance was not marked correctly");
+        const attendanceMarked = await attendanceInstance.checkAttendance(classId, { from: accounts[1] });
+        assert.equal(attendanceMarked, true, "Attendance was not marked correctly");
     });
 
-    it("should allow a teacher to check attendance for a student", async () => {
-        await this.attendance.createSubject("Mathematics", { from: owner });
-        await this.attendance.createClass(1672531200, 1, { from: owner });
-        await this.attendance.addStudent(student, "John Doe", { from: owner });
-        await this.attendance.addTeacher(teacher, "Dr. Smith", { from: owner });
-        await this.attendance.enrollStudent(1, student, { from: owner });
-        await this.attendance.assignTeacher(1, teacher, { from: owner });
-
-        await this.attendance.markAttendance(1, { from: student });
-        const isPresent = await this.attendance.checkAttendance(1, student, { from: teacher });
-        assert.isTrue(isPresent, "Teacher could not check attendance correctly");
+    it("should allow a teacher to check a student's attendance", async () => {
+        const classId = 1;
+        const studentAddress = accounts[1];
+        const attendanceChecked = await attendanceInstance.checkAttendance(classId, studentAddress, { from: accounts[2] });
+        assert.equal(attendanceChecked, true, "Teacher could not verify attendance correctly");
     });
 
-    it("should not allow a non-student to mark attendance", async () => {
-        await this.attendance.createSubject("Mathematics", { from: owner });
-        await this.attendance.createClass(1672531200, 1, { from: owner });
+    it("should prevent non-enrolled students from marking attendance", async () => {
+        const classId = 1;
         try {
-            await this.attendance.markAttendance(1, { from: otherAccount });
-            assert.fail("Non-student was able to mark attendance");
+            await attendanceInstance.markAttendance(classId, { from: accounts[3] });
+            assert.fail("Expected revert not received");
         } catch (error) {
-            assert.include(error.message, "Only enrolled students can call this function");
+            assert(
+                error.message.includes("Only enrolled students can call this function"),
+                `Expected 'Only enrolled students can call this function' but got ${error.message}`
+            );
         }
     });
 });

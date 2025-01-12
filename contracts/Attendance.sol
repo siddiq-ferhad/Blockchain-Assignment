@@ -43,8 +43,6 @@ contract Attendance {
     mapping(uint256 => Subject) public subjectDetails;
     mapping(uint256 => Class) public classDetails;
 
-    event StudentEnrolled(uint256 indexed subjectId, address indexed student);
-
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
@@ -72,6 +70,22 @@ contract Attendance {
         _;
     }
     
+    function getEnrolledStudents(uint256 _subjectId) public view returns (uint256[] memory) {
+        uint256[] memory studentIds = new uint256[](subjectDetails[_subjectId].enrolledStudents.length);
+        for (uint256 i = 0; i < subjectDetails[_subjectId].enrolledStudents.length; i++) {
+            studentIds[i] = subjectDetails[_subjectId].enrolledStudents[i].studentId;
+        }
+        return studentIds;
+    }
+
+    function getTeachingTeachers(uint256 _subjectId) public view returns (uint256[] memory) {
+        uint256[] memory teacherIds = new uint256[](subjectDetails[_subjectId].teachingTeachers.length);
+        for (uint256 i = 0; i < subjectDetails[_subjectId].teachingTeachers.length; i++) {
+            teacherIds[i] = subjectDetails[_subjectId].teachingTeachers[i].teacherId;
+        }
+        return teacherIds;
+    }
+
     function addStudent(address _student, string memory _name) public onlyOwner {
         studentCounter++;
         studentDetails[_student] = Student(studentCounter, _name);
@@ -103,9 +117,6 @@ contract Attendance {
 
     function enrollStudent(uint256 _subjectId, address _student) public onlyOwner {
         subjectDetails[_subjectId].enrolledStudents.push(studentDetails[_student]);
-
-        // Debug logging (only for testing purposes)
-        emit StudentEnrolled(_subjectId, _student);
     }
 
     function assignTeacher(uint256 _subjectId, address _teacher) public onlyOwner {
