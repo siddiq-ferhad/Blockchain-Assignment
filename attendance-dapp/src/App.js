@@ -1,4 +1,3 @@
-// App.js
 import React, { useEffect, useState } from "react";
 import getWeb3 from "./utils/getWeb3";
 import AttendanceContract from "./contracts/Attendance.json";
