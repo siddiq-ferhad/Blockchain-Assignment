@@ -35,7 +35,6 @@ contract Attendance {
         uint256 classId;
         uint256 classDate;
         mapping(address => bool) attendance;
-
     }
 
     mapping(address => Student) public studentDetails;
@@ -68,22 +67,6 @@ contract Attendance {
         }
         require(isEnrolled, "Only enrolled students can call this function");
         _;
-    }
-    
-    function getEnrolledStudents(uint256 _subjectId) public view returns (uint256[] memory) {
-        uint256[] memory studentIds = new uint256[](subjectDetails[_subjectId].enrolledStudents.length);
-        for (uint256 i = 0; i < subjectDetails[_subjectId].enrolledStudents.length; i++) {
-            studentIds[i] = subjectDetails[_subjectId].enrolledStudents[i].studentId;
-        }
-        return studentIds;
-    }
-
-    function getTeachingTeachers(uint256 _subjectId) public view returns (uint256[] memory) {
-        uint256[] memory teacherIds = new uint256[](subjectDetails[_subjectId].teachingTeachers.length);
-        for (uint256 i = 0; i < subjectDetails[_subjectId].teachingTeachers.length; i++) {
-            teacherIds[i] = subjectDetails[_subjectId].teachingTeachers[i].teacherId;
-        }
-        return teacherIds;
     }
 
     function addStudent(address _student, string memory _name) public onlyOwner {
@@ -138,5 +121,4 @@ contract Attendance {
     constructor() {
         owner = msg.sender;
     }
-
 }
