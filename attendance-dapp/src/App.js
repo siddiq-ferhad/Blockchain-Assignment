@@ -60,7 +60,7 @@ const App = () => {
       alert(`Student ${studentName} added successfully!`);
       setStudentName("");
       setStudentAddress("");
-      fetchStudents();
+      viewStudents();
     } catch (error) {
       console.error("Error adding student:", error);
       alert("Failed to add student.");
@@ -80,7 +80,7 @@ const App = () => {
       alert(`Teacher ${teacherName} added successfully!`);
       setTeacherName("");
       setTeacherAddress("");
-      fetchTeachers();
+      viewTeachers();
     } catch (error) {
       console.error("Error adding teacher:", error);
       alert("Failed to add teacher.");
@@ -99,7 +99,7 @@ const App = () => {
         .send({ from: accounts[0] });
       alert(`Subject ${subjectName} added successfully!`);
       setSubjectName("");
-      fetchSubjects(contract);
+      viewSubjects(contract);
     } catch (error) {
       console.error("Error adding subject:", error);
       alert("Failed to add subject.");
@@ -141,7 +141,7 @@ const App = () => {
         .assignTeacher(assignTeacherSubjectId, assignTeacherAddress)
         .send({ from: accounts[0] });
   
-      // Fetch the subject name for the success message
+      // View the subject name for the success message
       const subject = await contract.methods.subjectDetails(assignTeacherSubjectId).call();
       const subjectName = subject.subjectName;
   
@@ -156,45 +156,45 @@ const App = () => {
     }
   };
 
-  const fetchStudents = async () => {
+  const viewStudents = async () => {
     try {
       const studentCount = await contract.methods.studentCounter().call();
-      const fetchedStudents = [];
+      const viewedStudents = [];
       for (let i = 1; i <= studentCount; i++) {
         const student = await contract.methods.students(i - 1).call();
-        fetchedStudents.push(student);
+        viewedStudents.push(student);
       }
-      setStudents(fetchedStudents);
+      setStudents(viewedStudents);
     } catch (error) {
-      console.error("Error fetching students:", error);
+      console.error("Error viewing students:", error);
     }
   };
 
-  const fetchTeachers = async () => {
+  const viewTeachers = async () => {
     try {
       const teacherCount = await contract.methods.teacherCounter().call();
-      const fetchedTeachers = [];
+      const viewedTeachers = [];
       for (let i = 1; i <= teacherCount; i++) {
         const teacher = await contract.methods.teachers(i - 1).call();
-        fetchedTeachers.push(teacher);
+        viewedTeachers.push(teacher);
       }
-      setTeachers(fetchedTeachers);
+      setTeachers(viewedTeachers);
     } catch (error) {
-      console.error("Error fetching teachers:", error);
+      console.error("Error viewing teachers:", error);
     }
   };
 
-  const fetchSubjects = async () => {
+  const viewSubjects = async () => {
     try {
       const subjectCount = await contract.methods.subjectCounter().call();
-      const fetchedSubjects = [];
+      const viewedSubjects = [];
       for (let i = 1; i <= subjectCount; i++) {
         const subject = await contract.methods.subjectDetails(i).call();
-        fetchedSubjects.push(subject);
+        viewedSubjects.push(subject);
       }
-      setSubjects(fetchedSubjects);
+      setSubjects(viewedSubjects);
     } catch (error) {
-      console.error("Error fetching subjects:", error);
+      console.error("Error viewing subjects:", error);
     }
   };
 
@@ -285,7 +285,7 @@ const App = () => {
       <div className="lists-container">
         <div className="students-list">
           <h3>Students</h3>
-          <button onClick={fetchStudents}>Fetch Students</button>
+          <button onClick={viewStudents}>View Students</button>
           <ul>
             {students.map((student, index) => (
               <li key={index}>{`${student.studentId}: ${student.name}`}</li>
@@ -295,7 +295,7 @@ const App = () => {
 
         <div className="teachers-list">
           <h3>Teachers</h3>
-          <button onClick={fetchTeachers}>Fetch Teachers</button>
+          <button onClick={viewTeachers}>View Teachers</button>
           <ul>
             {teachers.map((teacher, index) => (
               <li key={index}>{`${teacher.teacherId}: ${teacher.name}`}</li>
@@ -305,7 +305,7 @@ const App = () => {
 
         <div className="subjects-list">
           <h3>Subjects</h3>
-          <button onClick={fetchSubjects}>Fetch Subjects</button>
+          <button onClick={viewSubjects}>View Subjects</button>
           <ul>
             {subjects.map((subject, index) => (
               <li key={index}>{`${subject.subjectId}: ${subject.subjectName}`}</li>
