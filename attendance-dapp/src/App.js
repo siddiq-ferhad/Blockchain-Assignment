@@ -9,10 +9,16 @@ const App = () => {
   const [contract, setContract] = useState(null);
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [studentName, setStudentName] = useState("");
   const [teacherName, setTeacherName] = useState("");
   const [studentAddress, setStudentAddress] = useState("");
   const [teacherAddress, setTeacherAddress] = useState("");
+  const [subjectName, setSubjectName] = useState("");
+  const [classDate, setClassDate] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [assignTeacherSubjectId, setAssignTeacherSubjectId] = useState("");
+  const [assignTeacherAddress, setAssignTeacherAddress] = useState("");
 
   useEffect(() => {
     const init = async () => {
@@ -81,6 +87,75 @@ const App = () => {
     }
   };
 
+  const addSubject = async () => {
+    if (!subjectName) {
+      alert("Please enter the subject name.");
+      return;
+    }
+
+    try {
+      await contract.methods
+        .createSubject(subjectName)
+        .send({ from: accounts[0] });
+      alert(`Subject ${subjectName} added successfully!`);
+      setSubjectName("");
+      fetchSubjects(contract);
+    } catch (error) {
+      console.error("Error adding subject:", error);
+      alert("Failed to add subject.");
+    }
+  };
+
+  const addClass = async () => {
+    if (!classDate || !subjectId) {
+      alert("Please enter both the class date and subject ID.");
+      return;
+    }
+
+    try {
+      const timestamp = new Date(classDate).getTime() / 1000; // Convert date to UNIX timestamp
+      const subject = await contract.methods.subjectDetails(subjectId).call();
+      const subjectName = subject.subjectName;
+
+      await contract.methods
+        .createClass(timestamp, subjectId)
+        .send({ from: accounts[0] });
+      alert(`Class for ${subjectName} on ${classDate} added successfully!`);
+      setClassDate("");
+      setSubjectId("");
+    } catch (error) {
+      console.error("Error adding class:", error);
+      alert("Failed to add class.");
+    }
+  };
+
+  const assignTeacher = async () => {
+    if (!assignTeacherSubjectId || !assignTeacherAddress) {
+      alert("Please enter both the subject ID and teacher address.");
+      return;
+    }
+  
+    try {
+      // Call the assignTeacher method from the contract
+      await contract.methods
+        .assignTeacher(assignTeacherSubjectId, assignTeacherAddress)
+        .send({ from: accounts[0] });
+  
+      // Fetch the subject name for the success message
+      const subject = await contract.methods.subjectDetails(assignTeacherSubjectId).call();
+      const subjectName = subject.subjectName;
+  
+      alert(`Teacher assigned to ${subjectName} successfully!`);
+  
+      // Clear inputs
+      setAssignTeacherSubjectId("");
+      setAssignTeacherAddress("");
+    } catch (error) {
+      console.error("Error assigning teacher:", error);
+      alert("Failed to assign teacher.");
+    }
+  };
+
   const fetchStudents = async () => {
     try {
       const studentCount = await contract.methods.studentCounter().call();
@@ -106,6 +181,20 @@ const App = () => {
       setTeachers(fetchedTeachers);
     } catch (error) {
       console.error("Error fetching teachers:", error);
+    }
+  };
+
+  const fetchSubjects = async () => {
+    try {
+      const subjectCount = await contract.methods.subjectCounter().call();
+      const fetchedSubjects = [];
+      for (let i = 1; i <= subjectCount; i++) {
+        const subject = await contract.methods.subjectDetails(i).call();
+        fetchedSubjects.push(subject);
+      }
+      setSubjects(fetchedSubjects);
+    } catch (error) {
+      console.error("Error fetching subjects:", error);
     }
   };
 
@@ -148,7 +237,51 @@ const App = () => {
         <button onClick={addTeacher}>Add Teacher</button>
       </div>
 
-      <h2>Student and Teacher Lists</h2>
+      <div className="section">
+        <h2>Add a New Subject</h2>
+        <input
+          type="text"
+          placeholder="Subject Name"
+          value={subjectName}
+          onChange={(e) => setSubjectName(e.target.value)}
+        />
+        <button onClick={addSubject}>Add Subject</button>
+      </div>
+
+      <div className="section">
+        <h2>Add a New Class</h2>
+        <input
+          type="date"
+          value={classDate}
+          onChange={(e) => setClassDate(e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Subject ID"
+          value={subjectId}
+          onChange={(e) => setSubjectId(e.target.value)}
+        />
+        <button onClick={addClass}>Add Class</button>
+      </div>
+
+      <div className="section">
+        <h2>Assign a Teacher to a Subject</h2>
+        <input
+          type="text"
+          placeholder="Subject ID"
+          value={assignTeacherSubjectId}
+          onChange={(e) => setAssignTeacherSubjectId(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Teacher Address"
+          value={assignTeacherAddress}
+          onChange={(e) => setAssignTeacherAddress(e.target.value)}
+        />
+        <button onClick={assignTeacher}>Assign Teacher</button>
+      </div>
+
+      <h2>Lists</h2>
       <div className="lists-container">
         <div className="students-list">
           <h3>Students</h3>
@@ -166,6 +299,16 @@ const App = () => {
           <ul>
             {teachers.map((teacher, index) => (
               <li key={index}>{`${teacher.teacherId}: ${teacher.name}`}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="subjects-list">
+          <h3>Subjects</h3>
+          <button onClick={fetchSubjects}>Fetch Subjects</button>
+          <ul>
+            {subjects.map((subject, index) => (
+              <li key={index}>{`${subject.subjectId}: ${subject.subjectName}`}</li>
             ))}
           </ul>
         </div>

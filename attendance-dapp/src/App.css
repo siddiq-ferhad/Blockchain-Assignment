@@ -31,6 +31,7 @@ input, button {
   border: 1px solid #ccc;
   border-radius: 5px;
   font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
 }
 
 button {
@@ -53,22 +54,37 @@ button:hover {
 }
 
 .students-list,
-.teachers-list {
+.teachers-list,
+.subjects-list {
   flex: 1;
   background: #f7f7f7;
   padding: 20px;
-  border-radius: 5px;
+  border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 17px;
+  font-size: 16px;
 }
 
 ul {
   list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
 ul li {
-  margin-bottom: 10px;
+  margin: 10px 0;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  transition: box-shadow 0.2s ease;
+}
+
+ul li:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+ul li span {
+  font-weight: bold;
 }
 
 @media (max-width: 768px) {
