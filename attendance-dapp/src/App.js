@@ -4,7 +4,6 @@ import AttendanceContract from "./contracts/Attendance.json";
 import './App.css';
 
 const App = () => {
-  const [web3, setWeb3] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [contract, setContract] = useState(null);
   const [students, setStudents] = useState([]);
@@ -19,12 +18,19 @@ const App = () => {
   const [subjectId, setSubjectId] = useState("");
   const [assignTeacherSubjectId, setAssignTeacherSubjectId] = useState("");
   const [assignTeacherAddress, setAssignTeacherAddress] = useState("");
+  const [enrollSubjectId, setEnrollSubjectId] = useState("");
+  const [enrollStudentAddress, setEnrollStudentAddress] = useState("");
+  const [searchStudentAddress, setSearchStudentAddress] = useState("");
+  const [searchedStudent, setSearchedStudent] = useState(null);
+  const [searchTeacherAddress, setSearchTeacherAddress] = useState("");
+  const [searchedTeacher, setSearchedTeacher] = useState(null);
+  const [searchSubjectId, setSearchSubjectId] = useState("");
+  const [searchedSubject, setSearchedSubject] = useState(null);
 
   useEffect(() => {
     const init = async () => {
       try {
         const web3Instance = await getWeb3();
-        setWeb3(web3Instance);
 
         const accounts = await web3Instance.eth.getAccounts();
         setAccounts(accounts);
@@ -144,8 +150,12 @@ const App = () => {
       // View the subject name for the success message
       const subject = await contract.methods.subjectDetails(assignTeacherSubjectId).call();
       const subjectName = subject.subjectName;
+
+      // Fetch the teacher's name using their address
+      const teacher = await contract.methods.teacherDetails(assignTeacherAddress).call();
+      const teacherName = teacher.name;
   
-      alert(`Teacher assigned to ${subjectName} successfully!`);
+      alert(`Teacher ${teacherName} assigned to ${subjectName} successfully!`);
   
       // Clear inputs
       setAssignTeacherSubjectId("");
@@ -155,6 +165,38 @@ const App = () => {
       alert("Failed to assign teacher.");
     }
   };
+
+  const enrollStudent = async () => {
+    if (!enrollSubjectId || !enrollStudentAddress) {
+      alert("Please enter both the subject ID and student address.");
+      return;
+    }
+  
+    try {
+      // Enroll the student
+      await contract.methods
+        .enrollStudent(enrollSubjectId, enrollStudentAddress)
+        .send({ from: accounts[0] });
+  
+      // Fetch the subject name
+      const subject = await contract.methods.subjectDetails(enrollSubjectId).call();
+      const subjectName = subject.subjectName;
+  
+      // Fetch the student name
+      const student = await contract.methods.studentDetails(enrollStudentAddress).call();
+      const studentName = student.name;
+  
+      // Display a success message with names
+      alert(`Student ${studentName} successfully enrolled in ${subjectName} subject!`);
+  
+      // Clear inputs
+      setEnrollSubjectId("");
+      setEnrollStudentAddress("");
+    } catch (error) {
+      console.error("Error enrolling student:", error);
+      alert("Failed to enroll student.");
+    }
+  };    
 
   const viewStudents = async () => {
     try {
@@ -197,6 +239,66 @@ const App = () => {
       console.error("Error viewing subjects:", error);
     }
   };
+
+  const searchStudent = async () => {
+    if (!searchStudentAddress) {
+      alert("Please enter a student address.");
+      return;
+    }
+  
+    try {
+      const student = await contract.methods.studentDetails(searchStudentAddress).call();
+      if (student && student.studentId !== "0") {
+        setSearchedStudent(student);
+      } else {
+        alert("Student not found.");
+        setSearchedStudent(null);
+      }
+    } catch (error) {
+      console.error("Error searching for student:", error);
+      alert("Please enter a valid student address.");
+    }
+  };  
+
+  const searchTeacher = async () => {
+    if (!searchTeacherAddress) {
+      alert("Please enter a teacher address.");
+      return;
+    }
+  
+    try {
+      const teacher = await contract.methods.teacherDetails(searchTeacherAddress).call();
+      if (teacher && teacher.teacherId !== "0") {
+        setSearchedTeacher(teacher);
+      } else {
+        alert("Teacher not found.");
+        setSearchedTeacher(null);
+      }
+    } catch (error) {
+      console.error("Error searching for teacher:", error);
+      alert("Please enter a valid teacher address.");
+    }
+  };  
+
+  const searchSubject = async () => {
+    if (!searchSubjectId) {
+      alert("Please enter a subject ID.");
+      return;
+    }
+  
+    try {
+      const subject = await contract.methods.subjectDetails(searchSubjectId).call();
+      if (subject && subject.subjectId !== "0") {
+        setSearchedSubject(subject);
+      } else {
+        alert("Subject not found.");
+        setSearchedSubject(null);
+      }
+    } catch (error) {
+      console.error("Error searching for subject:", error);
+      alert("Please enter a valid subject ID.");
+    }
+  };  
 
   return (
     <div className="App">
@@ -267,7 +369,7 @@ const App = () => {
       <div className="section">
         <h2>Assign a Teacher to a Subject</h2>
         <input
-          type="text"
+          type="number"
           placeholder="Subject ID"
           value={assignTeacherSubjectId}
           onChange={(e) => setAssignTeacherSubjectId(e.target.value)}
@@ -279,6 +381,80 @@ const App = () => {
           onChange={(e) => setAssignTeacherAddress(e.target.value)}
         />
         <button onClick={assignTeacher}>Assign Teacher</button>
+      </div>
+
+      <div className="section">
+        <h2>Enroll a Student in a Subject</h2>
+        <input
+          type="number"
+          placeholder="Subject ID"
+          value={enrollSubjectId}
+          onChange={(e) => setEnrollSubjectId(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Student Address"
+          value={enrollStudentAddress}
+          onChange={(e) => setEnrollStudentAddress(e.target.value)}
+        />
+        <button onClick={enrollStudent}>Enroll Student</button>
+      </div>
+
+      <h2>Search</h2>
+      <div className="lists-container">
+        <div className="search-student">
+          <h3>Student</h3>
+          <input
+            type="text"
+            placeholder="Enter Student Address"
+            value={searchStudentAddress}
+            onChange={(e) => setSearchStudentAddress(e.target.value)}
+          />
+          <button onClick={searchStudent}>Search Student</button>
+          {searchedStudent && (
+            <div>
+              <h3>Student Details:</h3>
+              <p>Student ID: {searchedStudent.studentId}</p>
+              <p>Student Name: {searchedStudent.name}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="search-teacher">
+          <h3>Teacher</h3>
+          <input
+            type="text"
+            placeholder="Enter Teacher Address"
+            value={searchTeacherAddress}
+            onChange={(e) => setSearchTeacherAddress(e.target.value)}
+          />
+          <button onClick={searchTeacher}>Search Teacher</button>
+          {searchedTeacher && (
+            <div>
+              <h3>Teacher Details:</h3>
+              <p>Teacher ID: {searchedTeacher.teacherId}</p>
+              <p>Teacher Name: {searchedTeacher.name}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="search-subject">
+          <h3>Subject</h3>
+          <input
+            type="number"
+            placeholder="Enter Subject ID"
+            value={searchSubjectId}
+            onChange={(e) => setSearchSubjectId(e.target.value)}
+          />
+          <button onClick={searchSubject}>Search Subject</button>
+          {searchedSubject && (
+            <div>
+              <h3>Subject Details:</h3>
+              <p>Subject ID: {searchedSubject.subjectId}</p>
+              <p>Subject Name: {searchedSubject.subjectName}</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <h2>Lists</h2>
