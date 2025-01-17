@@ -34,6 +34,7 @@ contract Attendance {
         Subject subject;
         uint256 classId;
         uint256 classDate;
+        uint256 classPwd;
         mapping(address => bool) attendance;
 
     }
@@ -107,7 +108,9 @@ contract Attendance {
         subjectDetails[_subjectId].teachingTeachers.push(teacherDetails[_teacher]);
     }
 
-    function markAttendance(uint256 _classId) public onlyEnrolledStudent(classDetails[_classId].classId) {
+    function markAttendance(uint256 _classId, uint256 _pwd) public onlyEnrolledStudent(classDetails[_classId].classId) {
+        require(classDetails[_classId].attendance[msg.sender] == false, "Attendance already marked");
+        require(classDetails[_classId].classPwd == _pwd, "Invalid password");
         classDetails[_classId].attendance[msg.sender] = true;
     }
 
@@ -117,6 +120,14 @@ contract Attendance {
 
     function checkAttendance(uint256 _classId, address _student) public view onlyTeacher returns (bool) {
         return classDetails[_classId].attendance[_student];
+    }
+
+    function generateClassPwd(uint256 _classId, uint256 _seed) public onlyTeacher {
+        classDetails[_classId].classPwd = getRandomNumber(_seed);
+    }
+
+    function getRandomNumber(uint256 seed) public view returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, seed)));
     }
 
     constructor() {
