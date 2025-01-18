@@ -1,39 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const TeacherPage = ({ contract, accounts }) => {
-  const [subjects, setSubjects] = useState([]);
 
-  // Function to fetch subjects
-  const fetchSubjects = async () => {
+  const [students, setStudents] = useState([]);
+
+  const viewStudents = async () => {
     try {
-      const subjectCount = await contract.methods.subjectCounter().call();
-      const subjectsList = [];
-      for (let i = 1; i <= subjectCount; i++) {
-        const subject = await contract.methods.subjectDetails(i).call();
-        subjectsList.push(subject);
+      const studentCount = await contract.methods.studentCounter().call();
+      const viewedStudents = [];
+      for (let i = 1; i <= studentCount; i++) {
+        const student = await contract.methods.students(i - 1).call();
+        viewedStudents.push(student);
       }
-      setSubjects(subjectsList);
+      setStudents(viewedStudents);
     } catch (error) {
-      console.error("Error fetching subjects:", error);
+      console.error("Error viewing students:", error);
     }
   };
 
-  useEffect(() => {
-    if (contract) {
-      fetchSubjects();
-    }
-  }, [contract]);
-
   return (
-    <div>
-      <h1>Teacher Dashboard</h1>
-      <h2>Assigned Subjects</h2>
-      <ul>
-        {subjects.map((subject, index) => (
-          <li key={index}>{subject.subjectName}</li>
-        ))}
-      </ul>
-    </div>
+    <div className="students-list">
+    <h3>Students</h3>
+    <button onClick={viewStudents}>View Students</button>
+    <ul>
+      {students.map((student, index) => (
+        <li key={index}>{`${student.studentId}: ${student.name}`}</li>
+      ))}
+    </ul>
+  </div>
   );
 };
 

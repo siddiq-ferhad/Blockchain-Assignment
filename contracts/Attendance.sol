@@ -42,7 +42,7 @@ contract Attendance {
     mapping(uint256 => Subject) public subjectDetails;
     mapping(uint256 => Class) public classDetails;
 
-    mapping(address => string) public roles; // Stores roles for addresses
+    mapping(address => string) public roles;
 
     constructor() {
         admin = msg.sender;
