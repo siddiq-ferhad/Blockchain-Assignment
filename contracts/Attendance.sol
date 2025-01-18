@@ -47,7 +47,6 @@ contract Attendance {
     event teacherAssigned(uint256 subjectId, address teacher);
     event attendanceMarked(uint256 classId, address student);
 
-
     mapping(address => Student) public studentDetails;
     mapping(address => Teacher) public teacherDetails;
     mapping(uint256 => Subject) public subjectDetails;
@@ -150,7 +149,7 @@ contract Attendance {
     }
 
     function getRandomNumber(uint256 seed) public view returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, seed)));
+        return uint256(keccak256(abi.encodePacked(block.timestamp, block.difficulty, msg.sender, seed)));
     }
 
     function removeStudent(address _student) public onlyAdmin {
