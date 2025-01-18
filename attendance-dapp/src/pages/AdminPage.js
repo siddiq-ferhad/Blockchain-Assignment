@@ -25,9 +25,6 @@ const AdminPage = ({ contract, accounts }) => {
       await contract.methods
         .addStudent(studentAddress, studentName)
         .send({ from: accounts[0] });
-      await contract.methods
-        .assignRole(studentAddress, "student")
-        .send({ from: accounts[0] });
       alert(`Student ${studentName} added successfully!`);
       setStudentName("");
       setStudentAddress("");
@@ -47,9 +44,6 @@ const AdminPage = ({ contract, accounts }) => {
     try {
       await contract.methods
         .addTeacher(teacherAddress, teacherName)
-        .send({ from: accounts[0] });
-      await contract.methods
-        .assignRole(teacherAddress, "teacher")
         .send({ from: accounts[0] });
       alert(`Teacher ${teacherName} added successfully!`);
       setTeacherName("");

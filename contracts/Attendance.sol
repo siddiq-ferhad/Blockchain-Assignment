@@ -86,7 +86,7 @@ contract Attendance {
         _;
     }
 
-    function assignRole(address user, string memory role) public onlyAdmin {
+    function assignRole(address user, string memory role) internal onlyAdmin {
         roles[user] = role;
     }
 
@@ -98,6 +98,7 @@ contract Attendance {
         studentCounter++;
         studentDetails[_student] = Student(studentCounter, _name);
         students.push(Student(studentCounter, _name));
+        assignRole(_student, "student");
 
         emit studentAdded(_student, _name);
     }   
@@ -106,6 +107,7 @@ contract Attendance {
         teacherCounter++;
         teacherDetails[_teacher] = Teacher(teacherCounter,_name);
         teachers.push(Teacher(teacherCounter, _name));
+        assignRole(_teacher, "teacher");
 
         emit teacherAdded(_teacher, _name);
     }
@@ -164,7 +166,7 @@ contract Attendance {
     }
 
     function getRandomNumber(uint256 seed) public view returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, seed)));
+        return uint256(keccak256(abi.encodePacked(block.timestamp, block.timestamp, msg.sender, seed)));
     }
 
     function removeStudent(address _student) public onlyAdmin {
