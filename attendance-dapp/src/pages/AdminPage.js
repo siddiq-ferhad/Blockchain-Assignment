@@ -4,6 +4,7 @@ const AdminPage = ({ contract, accounts }) => {
   const [students, setStudents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [studentName, setStudentName] = useState("");
   const [teacherName, setTeacherName] = useState("");
   const [studentAddress, setStudentAddress] = useState("");
@@ -290,6 +291,20 @@ const AdminPage = ({ contract, accounts }) => {
     }
   };
 
+  const viewClasses = async () => {
+    try {
+      const classCount = await contract.methods.classCounter().call();
+      const viewedClasses = [];
+      for (let i = 1; i <= classCount; i++) {
+        const _class = await contract.methods.classDetails(i).call();
+        viewedClasses.push(_class);
+      }
+      setClasses(viewedClasses);
+    } catch (error) {
+      console.error("Error viewing classes:", error);
+    }
+  }
+
   return (
     <div className="App">
       <h1>Attendance DApp</h1>
@@ -483,6 +498,19 @@ const AdminPage = ({ contract, accounts }) => {
               <li key={index} className="list-item">
                 <span>{`${subject.subjectId}: ${subject.subjectName}`}</span>
                 <button onClick={() => removeSubject(subject.subjectId)} className="remove-btn">X</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="class-list">
+          <h3>Classes</h3>
+          <button onClick={viewClasses}>View Classes</button>
+          <ul>
+            {classes.map((_class, index) => (
+              <li key={index} className="list-item">
+                <span>{`${_class.classId}: ${_class.subject.subjectName} - ${_class.classPwd}`}</span>
+                <button className="inviso"></button>
               </li>
             ))}
           </ul>
