@@ -9,9 +9,7 @@ import StudentPage from "./pages/StudentPage";
 import Unauthorized from "./pages/Unauthorized";
 import './App.css';
 
-
 const App = () => {
-  const [web3, setWeb3] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [contract, setContract] = useState(null);
   const [role, setRole] = useState("");
@@ -20,7 +18,6 @@ const App = () => {
     const init = async () => {
       try {
         const web3Instance = await getWeb3();
-        setWeb3(web3Instance);
 
         const accounts = await web3Instance.eth.getAccounts();
         setAccounts(accounts);
@@ -43,13 +40,12 @@ const App = () => {
     init();
   }, []);
 
-  // fetchRole function to fetch the user's role from the contract
   useEffect(() => {
     const fetchRole = async () => {
       if (contract && accounts.length > 0) {
         try {
           const userRole = await contract.methods.getRole(accounts[0]).call();
-          console.log("Fetched role:", userRole); // Debug log
+          console.log("Fetched role:", userRole);
           setRole(userRole);
         } catch (error) {
           console.error("Error fetching role:", error);
@@ -60,13 +56,6 @@ const App = () => {
     fetchRole();
   }, [contract, accounts]);
 
-  // debug logs
-  if (!web3) return <div>Loading Web3...</div>;
-  if (!contract) return <div>Loading contract...</div>;
-  if (accounts.length === 0) return <div>Loading accounts...</div>;
-  if (!role) return <div>Loading role data...</div>;
-
-// New Component for Role-Based Redirection
 const RoleRedirector = ({ role }) => {
     const navigate = useNavigate();
 
@@ -77,11 +66,10 @@ const RoleRedirector = ({ role }) => {
       else navigate("/");
     }, [role, navigate]);
 
-    return null; // No UI, just redirection
+    return null;
   };
 
   return (
-
     <Router>
       <RoleRedirector role={role} />
       <Routes>
