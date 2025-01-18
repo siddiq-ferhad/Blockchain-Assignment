@@ -159,13 +159,13 @@ contract Attendance {
         return classDetails[_classId].attendance[_student];
     }
 
-    function generateClassPwd(uint256 _classId, uint256 _seed) public onlyTeacher {
-        classDetails[_classId].classPwd = getRandomNumber(_seed);
-    }
+    // function generateClassPwd(uint256 _classId, uint256 _seed) public onlyTeacher {
+    //     classDetails[_classId].classPwd = getRandomNumber(_seed);
+    // }
 
-    function getRandomNumber(uint256 seed) public view returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, seed)));
-    }
+    // function getRandomNumber(uint256 seed) public view returns (uint256) {
+    //     return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, seed)));
+    // }
 
     function removeStudent(address _student) public onlyAdmin {
         delete studentDetails[_student];
