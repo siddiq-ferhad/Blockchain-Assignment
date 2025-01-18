@@ -100,7 +100,6 @@ const RoleRedirector = ({ role }) => {
         <Route path="/" element={<Unauthorized />} />
       </Routes>
     </Router>
-
   );
 };
 

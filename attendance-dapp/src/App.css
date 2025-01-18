@@ -83,7 +83,7 @@ ul {
 
 ul li {
   margin: 10px 0;
-  padding: 10px;
+  padding: 3px;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
@@ -96,6 +96,41 @@ ul li:hover {
 
 ul li span {
   font-weight: bold;
+  margin-left: 10px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center; /* Aligns the text and button vertically */
+  justify-content: space-between;
+}
+
+.remove-btn {
+  margin-right: 10px; /* Adds space between the name and the button */
+  width: 26px; /* Set the width of the button */
+  height: 26px; /* Set the height of the button */
+  padding: 0; /* Remove any default padding */
+  text-align: center; /* Centers the text inside the button */
+  line-height: 20px; /* Vertically centers the text inside the button */
+  font-size: 18px; /* Adjust font size to fit */
+  background-color: #f44336; /* Red background color */
+  color: white; /* White text color */
+  border: none; /* Remove border */
+  border-radius: 4px; /* Optional: Rounded corners */
+}
+
+.remove-btn:hover {
+  background-color: #d32f2f; /* Darker red on hover */
+}
+
+.forbidden {
+  text-align: center;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -100%);
+  font-size: larger;
 }
 
 @media (max-width: 768px) {
