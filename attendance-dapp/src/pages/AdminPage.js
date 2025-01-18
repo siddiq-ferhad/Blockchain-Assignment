@@ -104,22 +104,55 @@ const AdminPage = ({ contract, accounts }) => {
     }
   };
 
+  const removeStudent = async (address) => {
+    try {
+      await contract.methods.removeStudent(address).send({ from: accounts[0] });
+      alert("Student removed successfully!");
+      viewStudents();
+    } catch (error) {
+      console.error("Error removing student:", error);
+      alert("Failed to remove student.");
+    }
+  };
+
+  const removeTeacher = async (address) => {
+    try {
+      await contract.methods.removeTeacher(address).send({ from: accounts[0] });
+      alert("Teacher removed successfully!");
+      viewTeachers();
+    } catch (error) {
+      console.error("Error removing teacher:", error);
+      alert("Failed to remove teacher.");
+    }
+  };
+
+  const removeSubject = async (id) => {
+    try {
+      await contract.methods.removeSubject(id).send({ from: accounts[0] });
+      alert("Subject removed successfully!");
+      viewSubjects();
+    } catch (error) {
+      console.error("Error removing subject:", error);
+      alert("Failed to remove subject.");
+    }
+  };
+
   const assignTeacher = async () => {
     if (!assignTeacherSubjectId || !assignTeacherAddress) {
       alert("Please enter both the subject ID and teacher address.");
       return;
     }
-  
+
     try {
       await contract.methods
         .assignTeacher(assignTeacherSubjectId, assignTeacherAddress)
         .send({ from: accounts[0] });
-  
+
       const subject = await contract.methods.subjectDetails(assignTeacherSubjectId).call();
       const subjectName = subject.subjectName;
-  
+
       alert(`Teacher assigned to ${subjectName} successfully!`);
-  
+
       setAssignTeacherSubjectId("");
       setAssignTeacherAddress("");
     } catch (error) {
@@ -421,7 +454,10 @@ const AdminPage = ({ contract, accounts }) => {
           <button onClick={viewStudents}>View Students</button>
           <ul>
             {students.map((student, index) => (
-              <li key={index}>{`${student.studentId}: ${student.name}`}</li>
+              <li key={index} className="list-item">
+                <span>{`${student.studentId}: ${student.name}`}</span>
+                <button onClick={() => removeStudent(student.address)} className="remove-btn">X</button>
+              </li>
             ))}
           </ul>
         </div>
@@ -431,7 +467,10 @@ const AdminPage = ({ contract, accounts }) => {
           <button onClick={viewTeachers}>View Teachers</button>
           <ul>
             {teachers.map((teacher, index) => (
-              <li key={index}>{`${teacher.teacherId}: ${teacher.name}`}</li>
+              <li key={index} className="list-item">
+                <span>{`${teacher.teacherId}: ${teacher.name}`}</span>
+                <button onClick={() => removeTeacher(teacher.address)} className="remove-btn">X</button>
+              </li>
             ))}
           </ul>
         </div>
@@ -441,7 +480,10 @@ const AdminPage = ({ contract, accounts }) => {
           <button onClick={viewSubjects}>View Subjects</button>
           <ul>
             {subjects.map((subject, index) => (
-              <li key={index}>{`${subject.subjectId}: ${subject.subjectName}`}</li>
+              <li key={index} className="list-item">
+                <span>{`${subject.subjectId}: ${subject.subjectName}`}</span>
+                <button onClick={() => removeSubject(subject.subjectId)} className="remove-btn">X</button>
+              </li>
             ))}
           </ul>
         </div>
