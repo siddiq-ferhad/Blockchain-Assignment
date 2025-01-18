@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 contract Attendance {
 
-    address public owner;
+    address public admin;
     Student[] public students;
     Teacher[] public teachers;
     uint256 public classCounter;
@@ -42,8 +42,15 @@ contract Attendance {
     mapping(uint256 => Subject) public subjectDetails;
     mapping(uint256 => Class) public classDetails;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call this function");
+    mapping(address => string) public roles; // Stores roles for addresses
+
+    constructor() {
+        admin = msg.sender;
+        roles[msg.sender] = "admin"; // Contract deployer is the admin
+    }
+
+    modifier onlyAdmin() {
+        require(keccak256(abi.encodePacked(roles[msg.sender])) == keccak256(abi.encodePacked("admin")), "Only admin can call this function");
         _;
     }
 
@@ -69,26 +76,34 @@ contract Attendance {
         _;
     }
 
-    function addStudent(address _student, string memory _name) public onlyOwner {
+    function assignRole(address user, string memory role) public onlyAdmin {
+        roles[user] = role;
+    }
+
+    function getRole(address user) public view returns (string memory) {
+        return roles[user];
+    }
+
+    function addStudent(address _student, string memory _name) public onlyAdmin {
         studentCounter++;
         studentDetails[_student] = Student(studentCounter, _name);
         students.push(Student(studentCounter, _name));
     }   
 
-    function addTeacher(address _teacher, string memory _name) public onlyOwner {
+    function addTeacher(address _teacher, string memory _name) public onlyAdmin {
         teacherCounter++;
         teacherDetails[_teacher] = Teacher(teacherCounter,_name);
         teachers.push(Teacher(teacherCounter, _name));
     }
 
-    function createSubject(string memory _subjectName) public onlyOwner {
+    function createSubject(string memory _subjectName) public onlyAdmin {
         subjectCounter++;
         Subject storage newSubject = subjectDetails[subjectCounter];
         newSubject.subjectId=subjectCounter;
         newSubject.subjectName = _subjectName;
     }
 
-    function createClass(uint256 _classDate, uint256 _subjectId) public onlyOwner {
+    function createClass(uint256 _classDate, uint256 _subjectId) public onlyAdmin {
         classCounter++;
         
         Class storage newClass = classDetails[classCounter];
@@ -98,11 +113,11 @@ contract Attendance {
         subjectDetails[_subjectId].classIds.push(classCounter);
     }
 
-    function enrollStudent(uint256 _subjectId, address _student) public onlyOwner {
+    function enrollStudent(uint256 _subjectId, address _student) public onlyAdmin {
         subjectDetails[_subjectId].enrolledStudents.push(studentDetails[_student]);
     }
 
-    function assignTeacher(uint256 _subjectId, address _teacher) public onlyOwner {
+    function assignTeacher(uint256 _subjectId, address _teacher) public onlyAdmin {
         subjectDetails[_subjectId].teachingTeachers.push(teacherDetails[_teacher]);
     }
 
@@ -118,7 +133,4 @@ contract Attendance {
         return classDetails[_classId].attendance[_student];
     }
 
-    constructor() {
-        owner = msg.sender;
-    }
 }
