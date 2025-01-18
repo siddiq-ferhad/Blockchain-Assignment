@@ -34,8 +34,18 @@ contract Attendance {
         Subject subject;
         uint256 classId;
         uint256 classDate;
+        uint256 classPwd;
         mapping(address => bool) attendance;
     }
+
+    event studentAdded(address student, string name);
+    event teacherAdded(address teacher, string name);
+    event subjectCreated(uint256 subjectId, string subjectName);
+    event classCreated(uint256 classId, uint256 classDate, uint256 subjectId);
+    event studentEnrolled(uint256 subjectId, address student);
+    event teacherAssigned(uint256 subjectId, address teacher);
+    event attendanceMarked(uint256 classId, address student);
+
 
     mapping(address => Student) public studentDetails;
     mapping(address => Teacher) public teacherDetails;
@@ -88,12 +98,16 @@ contract Attendance {
         studentCounter++;
         studentDetails[_student] = Student(studentCounter, _name);
         students.push(Student(studentCounter, _name));
+
+        emit studentAdded(_student, _name);
     }   
 
     function addTeacher(address _teacher, string memory _name) public onlyAdmin {
         teacherCounter++;
         teacherDetails[_teacher] = Teacher(teacherCounter,_name);
         teachers.push(Teacher(teacherCounter, _name));
+
+        emit teacherAdded(_teacher, _name);
     }
 
     function createSubject(string memory _subjectName) public onlyAdmin {
@@ -101,6 +115,8 @@ contract Attendance {
         Subject storage newSubject = subjectDetails[subjectCounter];
         newSubject.subjectId=subjectCounter;
         newSubject.subjectName = _subjectName;
+
+        emit subjectCreated(subjectCounter, _subjectName);
     }
 
     function createClass(uint256 _classDate, uint256 _subjectId) public onlyAdmin {
@@ -111,18 +127,28 @@ contract Attendance {
         newClass.classId = classCounter;
         newClass.classDate = _classDate;
         subjectDetails[_subjectId].classIds.push(classCounter);
+
+        emit classCreated(classCounter, _classDate, _subjectId);
     }
 
     function enrollStudent(uint256 _subjectId, address _student) public onlyAdmin {
         subjectDetails[_subjectId].enrolledStudents.push(studentDetails[_student]);
+
+        emit studentEnrolled(_subjectId, _student);
     }
 
     function assignTeacher(uint256 _subjectId, address _teacher) public onlyAdmin {
         subjectDetails[_subjectId].teachingTeachers.push(teacherDetails[_teacher]);
+
+        emit teacherAssigned(_subjectId, _teacher);
     }
 
-    function markAttendance(uint256 _classId) public onlyEnrolledStudent(classDetails[_classId].classId) {
+    function markAttendance(uint256 _classId, uint256 _pwd) public onlyEnrolledStudent(classDetails[_classId].classId) {
+        require(classDetails[_classId].attendance[msg.sender] == false, "Attendance already marked");
+        require(classDetails[_classId].classPwd == _pwd, "Invalid password");
         classDetails[_classId].attendance[msg.sender] = true;
+
+        emit attendanceMarked(_classId, msg.sender);
     }
 
     function checkAttendance(uint256 _classId) public view returns (bool) {
@@ -131,6 +157,30 @@ contract Attendance {
 
     function checkAttendance(uint256 _classId, address _student) public view onlyTeacher returns (bool) {
         return classDetails[_classId].attendance[_student];
+    }
+
+    function generateClassPwd(uint256 _classId, uint256 _seed) public onlyTeacher {
+        classDetails[_classId].classPwd = getRandomNumber(_seed);
+    }
+
+    function getRandomNumber(uint256 seed) public view returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, seed)));
+    }
+
+    function removeStudent(address _student) public onlyAdmin {
+        delete studentDetails[_student];
+    }
+
+    function removeTeacher(address _teacher) public onlyAdmin {
+        delete teacherDetails[_teacher];
+    }
+
+    function removeSubject(uint256 _subjectId) public onlyAdmin {
+        delete subjectDetails[_subjectId];
+    }
+
+    function removeClass(uint256 _classId) public onlyAdmin {
+        delete classDetails[_classId];
     }
 
 }
