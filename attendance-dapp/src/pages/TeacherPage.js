@@ -27,10 +27,8 @@ const TeacherPage = ({ contract, accounts }) => {
       }
 
       await contract.methods.generateClassPwd(classId).send({ from: accounts[0] });
-
       const classDetails = await contract.methods.classDetails(classId).call();
       const passwordHash = classDetails.classPwd;
-
       const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@/!#";
       const generatedPassword = Array.from({ length: 15 }, (_, i) =>
         characters[
@@ -52,7 +50,7 @@ const TeacherPage = ({ contract, accounts }) => {
       // Remove the textarea from the DOM
       document.body.removeChild(textArea);
       alert("Password copied to clipboard!");
-      
+
     } catch (error) {
       console.error("Error generating class password:", error);
       alert("Failed to generate class password. Please check the inputs.");
@@ -84,7 +82,10 @@ const TeacherPage = ({ contract, accounts }) => {
           <button onClick={viewStudents}>View Students</button>
           <ul>
             {students.map((student, index) => (
-              <li key={index}>{`${student.studentId}: ${student.name}`}</li>
+              <li key={index} className="list-item">
+                <span>{`${student.studentId}: ${student.name}`}</span>
+                <button className="inviso"></button>
+              </li>
             ))}
           </ul>
         </div>

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
 const StudentPage = ({ contract, accounts }) => {
-  
+
   const [subjects, setSubjects] = useState([]);
   const [classId, setClassId] = useState("");
   const [password, setPassword] = useState("");
-  
+
   // Function to view all subjects
   const viewSubjects = async () => {
     try {
@@ -43,39 +43,44 @@ const StudentPage = ({ contract, accounts }) => {
   };
 
   return (
-    <div>
-      <div className="subjects-list">
-        <h3>Subjects</h3>
-        <button onClick={viewSubjects}>View Subjects</button>
-        <ul>
-          {subjects.map((subject, index) => (
-            <li key={index}>{`${subject.subjectId}: ${subject.subjectName}`}</li>
-          ))}
-        </ul>
-      </div>
+    <div className="App">
+      <h2>Welcome!</h2>
+      <div className="lists-container">
+        <div className="subjects-list">
+          <h3>Subjects</h3>
+          <button onClick={viewSubjects}>View Subjects</button>
+          <ul>
+            {subjects.map((subject, index) => (
+              <li key={index} className="list-item">
+                <span>{`${subject.subjectId}: ${subject.subjectName}`}</span>
+                <button className="inviso"></button>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <div className="attendance-section">
-        <h3>Mark Attendance</h3>
-        <input
-          type="text"
-          placeholder="Class ID"
-          value={classId}
-          onChange={(e) => setClassId(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Class Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={markAttendance}>Mark Attendance</button>
-      </div>
+        <div className="attendance-section">
+          <h3>Mark Attendance</h3>
+          <input
+            type="text"
+            placeholder="Class ID"
+            value={classId}
+            onChange={(e) => setClassId(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Class Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button onClick={markAttendance}>Mark Attendance</button>
+        </div>
 
-      <div className="attendance-history">
-        <h3>Attendance History</h3>
-        <p>Coming soon...</p>
+        <div className="attendance-section">
+          <h3>Attendance History</h3>
+          <p>Coming soon...</p>
+        </div>
       </div>
-
     </div>
   );
 };
