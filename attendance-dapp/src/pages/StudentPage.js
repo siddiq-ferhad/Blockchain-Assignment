@@ -88,22 +88,22 @@ const StudentPage = ({ contract, accounts }) => {
         </ul>
       </div>
 
-      <div className="mark-attendance-list">
-        <h3>Mark Attendance</h3>
-        <input
-          type="text"
-          placeholder="Class ID"
-          value={classId}
-          onChange={(e) => setClassId(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Class Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={markAttendance}>Mark Attendance</button>
-      </div>
+        <div className="attendance-section">
+          <h3>Mark Attendance</h3>
+          <input
+            type="text"
+            placeholder="Class ID"
+            value={classId}
+            onChange={(e) => setClassId(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Class Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button onClick={markAttendance}>Mark Attendance</button>
+        </div>
 
       <div className="check-attendance-list">
         <h3>Attendance History</h3>
@@ -118,7 +118,6 @@ const StudentPage = ({ contract, accounts }) => {
           ))}
         </ul>
       </div>
-
     </div>
   );
 };

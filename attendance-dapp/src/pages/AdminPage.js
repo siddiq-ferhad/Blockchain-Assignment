@@ -531,23 +531,9 @@ const AdminPage = ({ contract, accounts }) => {
           <button onClick={viewClasses}>View Classes</button>
           <ul>
             {classes.map((_class, index) => (
-              <li key={index}>
-              {`${_class.classId}: ${_class.subject.subjectName} | 
-                password: ${_class.classPwd}`
-              }</li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="check-attendance-list">
-          <h3>Attendance History</h3>
-          <button onClick={viewAttendance}>View Attendance</button>
-          <ul>
-            {attendanceHistory.map((entry, index) => (
-              <li key={index}>
-              {`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${
-                entry.attended ? "Present" : "Absent"
-              }`}
+              <li key={index} className="list-item">
+                <span>{`${_class.classId}: ${_class.subject.subjectName} - ${_class.classPwd}`}</span>
+                <button className="inviso"></button>
               </li>
             ))}
           </ul>
