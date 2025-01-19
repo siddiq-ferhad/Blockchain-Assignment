@@ -508,7 +508,10 @@ const AdminPage = ({ contract, accounts }) => {
           <button onClick={viewClasses}>View Classes</button>
           <ul>
             {classes.map((_class, index) => (
-              <li key={index}>{`${_class.classId}: ${_class.subject.subjectName} ${_class.classPwd}`}</li>
+              <li key={index} className="list-item">
+                <span>{`${_class.classId}: ${_class.subject.subjectName} - ${_class.classPwd}`}</span>
+                <button className="inviso"></button>
+              </li>
             ))}
           </ul>
         </div>

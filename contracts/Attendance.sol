@@ -161,12 +161,23 @@ contract Attendance {
         return classDetails[_classId].attendance[_student];
     }
 
-    function generateClassPwd(uint256 _classId, uint256 _seed) public onlyTeacher {
-        classDetails[_classId].classPwd = getRandomNumber(_seed);
+    function generateClassPwd(uint256 _classId) public onlyTeacher {
+        string memory randomPwd = getRandomPassword();
+        classDetails[_classId].classPwd = uint256(keccak256(abi.encodePacked(randomPwd)));
     }
 
-    function getRandomNumber(uint256 seed) public view returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(block.timestamp, block.timestamp, msg.sender, seed)));
+    function getRandomPassword() public view returns (string memory) {
+        bytes memory characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@/!#";
+        uint256 length = 15;
+        bytes memory password = new bytes(length);
+        uint256 seed = uint256(keccak256(abi.encodePacked(block.timestamp, blockhash(block.number - 1), msg.sender)));
+
+        for (uint256 i = 0; i < length; i++) {
+            uint256 randomIndex = seed % characters.length;
+            password[i] = characters[randomIndex];
+            seed = seed / characters.length;
+        }
+        return string(password);
     }
 
     function removeStudent(address _student) public onlyAdmin {
@@ -184,5 +195,4 @@ contract Attendance {
     function removeClass(uint256 _classId) public onlyAdmin {
         delete classDetails[_classId];
     }
-
 }
