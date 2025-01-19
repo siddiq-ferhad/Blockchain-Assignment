@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
 const StudentPage = ({ contract, accounts }) => {
-
   const [subjects, setSubjects] = useState([]);
   const [classId, setClassId] = useState("");
   const [password, setPassword] = useState("");

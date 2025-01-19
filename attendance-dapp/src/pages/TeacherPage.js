@@ -28,13 +28,7 @@ const TeacherPage = ({ contract, accounts }) => {
 
       await contract.methods.generateClassPwd(classId).send({ from: accounts[0] });
       const classDetails = await contract.methods.classDetails(classId).call();
-      const passwordHash = classDetails.classPwd;
-      const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@/!#";
-      const generatedPassword = Array.from({ length: 15 }, (_, i) =>
-        characters[
-        parseInt(passwordHash.toString().slice(i * 2, i * 2 + 2), 16) % characters.length
-        ]
-      ).join("");
+      const generatedPassword = classDetails.classPwd;
 
       setGeneratedPwd(generatedPassword);
 
