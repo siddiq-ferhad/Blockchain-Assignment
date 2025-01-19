@@ -43,7 +43,7 @@ const StudentPage = ({ contract, accounts }) => {
 
   return (
     <div className="App">
-      <h2>Welcome!</h2>
+      <h2>Welcome Student!</h2>
       <div className="lists-container">
         <div className="subjects-list">
           <h3>Subjects</h3>

@@ -197,6 +197,23 @@ contract Attendance {
         return subject.enrolledStudents;
     }
 
+    function getClassesForSubject(uint256 _subjectId) public view onlyTeacher returns (uint256[] memory) {
+        Subject storage subject = subjectDetails[_subjectId];
+
+        // Verify that the teacher is assigned to this subject
+        bool isAssigned = false;
+        for (uint256 i = 0; i < subject.teachingTeachers.length; i++) {
+            if (subject.teachingTeachers[i].teacherId == teacherDetails[msg.sender].teacherId) {
+                isAssigned = true;
+                break;
+            }
+        }
+
+        require(isAssigned, "You are not assigned to this subject");
+
+        return subject.classIds;
+    }
+
     function removeStudent(address _student) public onlyAdmin {
         delete studentDetails[_student];
     }
