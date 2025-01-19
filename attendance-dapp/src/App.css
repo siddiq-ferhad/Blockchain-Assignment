@@ -57,7 +57,8 @@ button:hover {
 .teachers-list,
 .subjects-list,
 .class-list,
-.generate-password {
+.generate-password,
+.attendance-section {
   flex: 1;
   background: #f7f7f7;
   padding: 20px;
