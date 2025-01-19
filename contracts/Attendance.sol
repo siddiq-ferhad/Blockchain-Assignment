@@ -131,6 +131,7 @@ contract Attendance {
     function markAttendance(uint256 _classId, uint256 _pwd) public onlyEnrolledStudent(classDetails[_classId].classId) {
         require(classDetails[_classId].attendance[msg.sender] == false, "Attendance already marked");
         require(classDetails[_classId].classPwd == _pwd, "Invalid password");
+        require(classDetails[_classId].classPwd != 0, "Password not generated");
         classDetails[_classId].attendance[msg.sender] = true;
 
         emit attendanceMarked(_classId, msg.sender);
