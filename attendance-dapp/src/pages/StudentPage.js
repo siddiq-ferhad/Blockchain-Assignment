@@ -2,22 +2,32 @@ import React, { useState } from "react";
 
 const StudentPage = ({ contract, accounts }) => {
   
-  const [subjects, setSubjects] = useState([]);
+  const [subjects] = useState([]);
+  const [enrolledClasses, setEnrolledClasses] = useState([]);
   const [classId, setClassId] = useState("");
   const [password, setPassword] = useState("");
-  
-  // Function to view all subjects
-  const viewSubjects = async () => {
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
+
+  // Function to list enrolled classes
+  const viewEnrolledClasses = async () => {
     try {
-      const subjectCount = await contract.methods.subjectCounter().call();
-      const viewedSubjects = [];
-      for (let i = 1; i <= subjectCount; i++) {
-        const subject = await contract.methods.subjectDetails(i).call();
-        viewedSubjects.push(subject);
+      const enrolledClassesList = [];
+      for (let subject of subjects) {
+        const subjectDetails = await contract.methods.subjectDetails(subject.subjectId).call();
+        const classIds = await contract.methods.getClassIds(subject.subjectId).call(); // Fetch the array of class IDs from the contract
+  
+        // Iterate through class IDs and add them to the enrolledClassesList
+        for (let classId of classIds) {
+          enrolledClassesList.push({
+            classId,
+            subjectName: subject.subjectName,
+          });
+        }
       }
-      setSubjects(viewedSubjects);
+      setEnrolledClasses(enrolledClassesList);
     } catch (error) {
-      console.error("Error viewing subjects:", error);
+      console.error("Error fetching enrolled classes:", error);
+      alert("Failed to fetch enrolled classes.");
     }
   };
 
@@ -42,19 +52,43 @@ const StudentPage = ({ contract, accounts }) => {
     }
   };
 
+  // Function to check attendance
+  const viewAttendance = async () => {
+    try {
+      const studentAttendance = [];
+      for (let enrolledClass of enrolledClasses) {
+        const isAttended = await contract.methods
+          .checkAttendance(enrolledClass.classId)
+          .call({ from: accounts[0] });
+
+        studentAttendance.push({
+          classId: enrolledClass.classId,
+          subjectName: enrolledClass.subjectName,
+          attended: isAttended,
+        });
+      }
+      setAttendanceHistory(studentAttendance);
+    } catch (error) {
+      console.error("Error fetching attendance history:", error);
+      alert("Failed to fetch attendance history.");
+    }
+  };
+
   return (
     <div>
-      <div className="subjects-list">
-        <h3>Subjects</h3>
-        <button onClick={viewSubjects}>View Subjects</button>
+      <div className="enrolled-classes-list">
+        <h3>Enrolled Classes</h3>
+        <button onClick={viewEnrolledClasses}>View Enrolled Classes</button>
         <ul>
-          {subjects.map((subject, index) => (
-            <li key={index}>{`${subject.subjectId}: ${subject.subjectName}`}</li>
+          {enrolledClasses.map((enrolledClass, index) => (
+            <li key={index}>
+              {` ${enrolledClass.classId}: ${enrolledClass.subjectName}`}
+            </li>
           ))}
         </ul>
       </div>
 
-      <div className="attendance-section">
+      <div className="mark-attendance-list">
         <h3>Mark Attendance</h3>
         <input
           type="text"
@@ -71,9 +105,18 @@ const StudentPage = ({ contract, accounts }) => {
         <button onClick={markAttendance}>Mark Attendance</button>
       </div>
 
-      <div className="attendance-history">
+      <div className="check-attendance-list">
         <h3>Attendance History</h3>
-        <p>Coming soon...</p>
+        <button onClick={viewAttendance}>View Attendance</button>
+        <ul>
+          {attendanceHistory.map((entry, index) => (
+            <li key={index}>
+            {`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${
+              entry.attended ? "Present" : "Absent"
+            }`}
+            </li>
+          ))}
+        </ul>
       </div>
 
     </div>

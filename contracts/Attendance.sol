@@ -133,6 +133,10 @@ contract Attendance {
         emit classCreated(classCounter, _classDate, _subjectId);
     }
 
+    function getClassIds(uint256 _subjectId) public view returns (uint256[] memory) {
+        return subjectDetails[_subjectId].classIds;
+    }
+
     function enrollStudent(uint256 _subjectId, address _student) public onlyAdmin {
         subjectDetails[_subjectId].enrolledStudents.push(studentDetails[_student]);
 

@@ -22,6 +22,7 @@ const AdminPage = ({ contract, accounts }) => {
   const [searchedTeacher, setSearchedTeacher] = useState(null);
   const [searchSubjectId, setSearchSubjectId] = useState("");
   const [searchedSubject, setSearchedSubject] = useState(null);
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
 
   const addStudent = async () => {
     if (!studentName || !studentAddress) {
@@ -305,6 +306,28 @@ const AdminPage = ({ contract, accounts }) => {
     }
   }
 
+  const viewAttendance = async () => {
+    try {
+      const studentAttendance = [];
+      for (let subject of subjects) {
+        for (let classId of subject.classIds) {
+          const isAttended = await contract.methods
+            .checkAttendance(classId)
+            .call({ from: accounts[0] });
+          studentAttendance.push({
+            classId,
+            subjectName: subject.subjectName,
+            attended: isAttended,
+          });
+        }
+      }
+      setAttendanceHistory(studentAttendance);
+    } catch (error) {
+      console.error("Error fetching attendance history:", error);
+      alert("Failed to fetch attendance history.");
+    }
+  };
+
   return (
     <div className="App">
       <h1>Attendance DApp</h1>
@@ -508,7 +531,24 @@ const AdminPage = ({ contract, accounts }) => {
           <button onClick={viewClasses}>View Classes</button>
           <ul>
             {classes.map((_class, index) => (
-              <li key={index}>{`${_class.classId}: ${_class.subject.subjectName} ${_class.classPwd}`}</li>
+              <li key={index}>
+              {`${_class.classId}: ${_class.subject.subjectName} | 
+                password: ${_class.classPwd}`
+              }</li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="check-attendance-list">
+          <h3>Attendance History</h3>
+          <button onClick={viewAttendance}>View Attendance</button>
+          <ul>
+            {attendanceHistory.map((entry, index) => (
+              <li key={index}>
+              {`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${
+                entry.attended ? "Present" : "Absent"
+              }`}
+              </li>
             ))}
           </ul>
         </div>
