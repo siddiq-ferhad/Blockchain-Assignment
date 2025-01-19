@@ -3,19 +3,21 @@ import React, { useState } from "react";
 const TeacherPage = ({ contract, accounts }) => {
   const [students, setStudents] = useState([]);
   const [classId, setClassId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
   const [generatedPwd, setGeneratedPwd] = useState("");
 
-  const viewStudents = async () => {
+  const viewEnrolledStudents = async (subjectId) => {
     try {
-      const studentCount = await contract.methods.studentCounter().call();
-      const viewedStudents = [];
-      for (let i = 1; i <= studentCount; i++) {
-        const student = await contract.methods.students(i - 1).call();
-        viewedStudents.push(student);
+      if (!subjectId) {
+        alert("Please enter Subject ID.");
+        return;
       }
-      setStudents(viewedStudents);
+
+      const enrolledStudents = await contract.methods.getEnrolledStudents(subjectId).call({ from: accounts[0] });
+      setStudents(enrolledStudents);
     } catch (error) {
-      console.error("Error viewing students:", error);
+      console.error("Error fetching enrolled students:", error);
+      alert("Failed to fetch students. Please check the Subject ID.");
     }
   };
 
@@ -72,8 +74,14 @@ const TeacherPage = ({ contract, accounts }) => {
         </div>
 
         <div className="students-list">
-          <h3>Students</h3>
-          <button onClick={viewStudents}>View Students</button>
+          <h3>View Enrolled Students</h3>
+          <input
+            type="text"
+            placeholder="Subject ID"
+            value={subjectId}
+            onChange={(e) => setSubjectId(e.target.value)}
+          />
+          <button onClick={() => viewEnrolledStudents(subjectId)}>View Students</button>
           <ul>
             {students.map((student, index) => (
               <li key={index} className="list-item">
