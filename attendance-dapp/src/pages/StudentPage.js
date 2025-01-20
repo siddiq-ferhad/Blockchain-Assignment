@@ -5,6 +5,8 @@ const StudentPage = ({ contract, accounts }) => {
   const [password, setPassword] = useState("");
   const [enrolledSubjects, setEnrolledSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
+  const [enrolledClasses] = useState([]);
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
 
   // Function to mark attendance
   const markAttendance = async () => {
@@ -24,6 +26,28 @@ const StudentPage = ({ contract, accounts }) => {
     } catch (error) {
       console.error("Error marking attendance:", error);
       alert("Failed to mark attendance. Please check your inputs.");
+    }
+  };
+
+  // Function to check attendance
+  const viewAttendance = async () => {
+    try {
+      const studentAttendance = [];
+      for (let enrolledClass of enrolledClasses) {
+        const isAttended = await contract.methods
+          .checkAttendance(enrolledClass.classId)
+          .call({ from: accounts[0] });
+
+        studentAttendance.push({
+          classId: enrolledClass.classId,
+          subjectName: enrolledClass.subjectName,
+          attended: isAttended,
+        });
+      }
+      setAttendanceHistory(studentAttendance);
+    } catch (error) {
+      console.error("Error fetching attendance history:", error);
+      alert("Failed to fetch attendance history.");
     }
   };
 
@@ -89,7 +113,15 @@ const StudentPage = ({ contract, accounts }) => {
 
         <div className="attendance-section">
           <h3>Attendance History</h3>
-          <p>Coming soon...</p>
+          <button onClick={viewAttendance}>View Attendance</button>
+          <ul>
+            {attendanceHistory.map((entry, index) => (
+              <li key={index}>
+                {`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${entry.attended ? "Present" : "Absent"
+                  }`}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
