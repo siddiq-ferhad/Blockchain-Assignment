@@ -3,17 +3,19 @@ import React, { useState } from "react";
 const TeacherPage = ({ contract, accounts }) => {
   const [students, setStudents] = useState([]);
   const [classId, setClassId] = useState("");
-  const [subjectId, setSubjectId] = useState("");
+  const [classes, setClasses] = useState([]);
+  const [enrollSubjectId, enrollSetSubjectId] = useState("");
+  const [classSubjectId, classSetSubjectId] = useState("");
   const [generatedPwd, setGeneratedPwd] = useState("");
 
   const viewEnrolledStudents = async (subjectId) => {
     try {
-      if (!subjectId) {
+      if (!enrollSubjectId) {
         alert("Please enter Subject ID.");
         return;
       }
 
-      const enrolledStudents = await contract.methods.getEnrolledStudents(subjectId).call({ from: accounts[0] });
+      const enrolledStudents = await contract.methods.getEnrolledStudents(enrollSubjectId).call({ from: accounts[0] });
       setStudents(enrolledStudents);
     } catch (error) {
       console.error("Error fetching enrolled students:", error);
@@ -53,9 +55,38 @@ const TeacherPage = ({ contract, accounts }) => {
     }
   };
 
+  const viewClasses = async () => {
+    try {
+      if (!classSubjectId) {
+        alert("Please enter Subject ID.");
+        return;
+      }
+
+      const classIds = await contract.methods.getClassesForTeacher(classSubjectId).call({ from: accounts[0] });
+      const classDetailsList = [];
+
+      for (const id of classIds) {
+        const classDetails = await contract.methods.classDetails(id).call();
+        const subjectDetails = await contract.methods.subjectDetails(classSubjectId).call();
+
+        classDetailsList.push({
+          classId: id,
+          subjectName: subjectDetails.subjectName,
+          classDate: new Date(parseInt(classDetails.classDate) * 1000).toLocaleDateString(),
+          classPwd: classDetails.classPwd,
+        });
+      }
+
+      setClasses(classDetailsList);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+      alert("Failed to fetch classes. Please check the inputs or your permissions.");
+    }
+  };
+
   return (
     <div className="App">
-      <h2>Teacher Page</h2>
+      <h2>Welcome Teacher!</h2>
       <div className="lists-container">
         <div className="generate-password">
           <h3>Generate Class Password</h3>
@@ -74,14 +105,14 @@ const TeacherPage = ({ contract, accounts }) => {
         </div>
 
         <div className="students-list">
-          <h3>View Enrolled Students</h3>
+          <h3>Enrolled Students</h3>
           <input
             type="text"
             placeholder="Subject ID"
-            value={subjectId}
-            onChange={(e) => setSubjectId(e.target.value)}
+            value={enrollSubjectId}
+            onChange={(e) => enrollSetSubjectId(e.target.value)}
           />
-          <button onClick={() => viewEnrolledStudents(subjectId)}>View Students</button>
+          <button onClick={() => viewEnrolledStudents(enrollSubjectId)}>View Students</button>
           <ul>
             {students.map((student, index) => (
               <li key={index} className="list-item">
@@ -91,6 +122,28 @@ const TeacherPage = ({ contract, accounts }) => {
             ))}
           </ul>
         </div>
+      </div>
+
+      <div className="class-list">
+        <h3>Classes</h3>
+        <input
+          type="text"
+          placeholder="Subject ID"
+          value={classSubjectId}
+          onChange={(e) => classSetSubjectId(e.target.value)}
+        />
+        <button onClick={viewClasses}>View Classes</button>
+        <ul>
+          {classes.map((classInfo, index) => (
+            <li key={index} className="list-item">
+              <span><strong>Class ID:</strong> {classInfo.classId}</span><br />
+              <span><strong>Subject Name:</strong> {classInfo.subjectName}</span><br />
+              <span><strong>Class Date:</strong> {classInfo.classDate}</span><br />
+              <span><strong>Class Password:</strong> {classInfo.classPwd}</span>
+              <button className="inviso"></button>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

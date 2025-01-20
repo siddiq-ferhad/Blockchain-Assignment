@@ -1,35 +1,12 @@
 import React, { useState } from "react";
 
 const StudentPage = ({ contract, accounts }) => {
-  
-  const [subjects] = useState([]);
-  const [enrolledClasses, setEnrolledClasses] = useState([]);
   const [classId, setClassId] = useState("");
   const [password, setPassword] = useState("");
+  const [enrolledSubjects, setEnrolledSubjects] = useState([]);
+  const [classes, setClasses] = useState([]);
+  const [enrolledClasses] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
-
-  // Function to list enrolled classes
-  const viewEnrolledClasses = async () => {
-    try {
-      const enrolledClassesList = [];
-      for (let subject of subjects) {
-        const subjectDetails = await contract.methods.subjectDetails(subject.subjectId).call();
-        const classIds = await contract.methods.getClassIds(subject.subjectId).call(); // Fetch the array of class IDs from the contract
-  
-        // Iterate through class IDs and add them to the enrolledClassesList
-        for (let classId of classIds) {
-          enrolledClassesList.push({
-            classId,
-            subjectName: subject.subjectName,
-          });
-        }
-      }
-      setEnrolledClasses(enrolledClassesList);
-    } catch (error) {
-      console.error("Error fetching enrolled classes:", error);
-      alert("Failed to fetch enrolled classes.");
-    }
-  };
 
   // Function to mark attendance
   const markAttendance = async () => {
@@ -74,20 +51,49 @@ const StudentPage = ({ contract, accounts }) => {
     }
   };
 
-  return (
-    <div>
-      <div className="enrolled-classes-list">
-        <h3>Enrolled Classes</h3>
-        <button onClick={viewEnrolledClasses}>View Enrolled Classes</button>
-        <ul>
-          {enrolledClasses.map((enrolledClass, index) => (
-            <li key={index}>
-              {` ${enrolledClass.classId}: ${enrolledClass.subjectName}`}
-            </li>
-          ))}
-        </ul>
-      </div>
+  const viewEnrolledSubjects = async () => {
+    try {
+      const subjectIds = await contract.methods.getSubjectsForStudent().call({ from: accounts[0] });
 
+      const subjects = [];
+      for (const subjectId of subjectIds) {
+        const subject = await contract.methods.subjectDetails(subjectId).call();
+        subjects.push(subject);
+      }
+
+      setEnrolledSubjects(subjects);
+    } catch (error) {
+      console.error("Error viewing enrolled subjects:", error);
+    }
+  };
+
+  const viewClassesForSubject = async (subjectId) => {
+    try {
+      const classIds = await contract.methods.getClassesForStudent(subjectId).call({ from: accounts[0] });
+      const classDetailsList = [];
+
+      for (const id of classIds) {
+        const classDetails = await contract.methods.classDetails(id).call();
+        const subjectDetails = await contract.methods.subjectDetails(subjectId).call();
+
+        classDetailsList.push({
+          classId: id,
+          subjectName: subjectDetails.subjectName,
+          classDate: new Date(parseInt(classDetails.classDate) * 1000).toLocaleDateString(),
+        });
+      }
+
+      setClasses(classDetailsList);
+    } catch (error) {
+      console.error("Error fetching classes:", error);
+      alert("Failed to fetch classes. Please check the inputs or your permissions.");
+    }
+  };
+
+  return (
+    <div className="App">
+      <h2>Welcome Student!</h2>
+      <div className="lists-container">
         <div className="attendance-section">
           <h3>Mark Attendance</h3>
           <input
@@ -105,18 +111,49 @@ const StudentPage = ({ contract, accounts }) => {
           <button onClick={markAttendance}>Mark Attendance</button>
         </div>
 
-      <div className="check-attendance-list">
-        <h3>Attendance History</h3>
-        <button onClick={viewAttendance}>View Attendance</button>
-        <ul>
-          {attendanceHistory.map((entry, index) => (
-            <li key={index}>
-            {`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${
-              entry.attended ? "Present" : "Absent"
-            }`}
-            </li>
-          ))}
-        </ul>
+        <div className="attendance-section">
+          <h3>Attendance History</h3>
+          <button onClick={viewAttendance}>View Attendance</button>
+          <ul>
+            {attendanceHistory.map((entry, index) => (
+              <li key={index}>
+                {`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${entry.attended ? "Present" : "Absent"
+                  }`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="lists-container">
+        <div className="enrolled-subjects">
+          <h3>Your Enrolled Subjects</h3>
+          <button onClick={viewEnrolledSubjects}>View Subjects</button>
+          <ul>
+            {enrolledSubjects.map((subject, index) => (
+              <li key={index} className="list-item">
+                <span>
+                  ID: {subject.subjectId} - {subject.subjectName}
+                </span>
+                <button className="view-classes-btn" onClick={() => viewClassesForSubject(subject.subjectId)}>View Classes</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="class-list">
+          <h3>Classes</h3>
+          <ul>
+            {classes.map((classInfo, index) => (
+              <li key={index} className="list-item">
+                <span><strong>Class ID:</strong> {classInfo.classId}</span><br />
+                <span><strong>Subject Name:</strong> {classInfo.subjectName}</span><br />
+                <span><strong>Class Date:</strong> {classInfo.classDate}</span><br />
+                <button className="inviso"></button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

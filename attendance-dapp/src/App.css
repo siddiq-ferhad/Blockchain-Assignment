@@ -78,6 +78,14 @@ button:hover {
   font-size: 16px;
 }
 
+.enrolled-subjects {
+  flex: 0.5; 
+  padding: 15px;
+  background: #f7f7f7;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 ul {
   list-style-type: none;
   padding: 0;
@@ -152,6 +160,24 @@ ul li span {
   left: 50%;
   transform: translate(-50%, -100%);
   font-size: larger;
+}
+
+.view-classes-btn {
+  margin-right: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+  width: auto;
+  height: auto;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.view-classes-btn:hover {
+  background-color: #0056b3;
 }
 
 @media (max-width: 768px) {
