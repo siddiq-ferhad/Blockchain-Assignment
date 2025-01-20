@@ -62,7 +62,7 @@ const TeacherPage = ({ contract, accounts }) => {
         return;
       }
 
-      const classIds = await contract.methods.getClassesForSubject(classSubjectId).call({ from: accounts[0] });
+      const classIds = await contract.methods.getClassesForTeacher(classSubjectId).call({ from: accounts[0] });
       const classDetailsList = [];
 
       for (const id of classIds) {

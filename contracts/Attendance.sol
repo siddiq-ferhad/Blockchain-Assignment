@@ -183,7 +183,6 @@ contract Attendance {
     function getEnrolledStudents(uint256 _subjectId) public view onlyTeacher returns (Student[] memory) {
         Subject storage subject = subjectDetails[_subjectId];
 
-        // Check if the teacher is assigned to the subject
         bool isAssigned = false;
         for (uint256 i = 0; i < subject.teachingTeachers.length; i++) {
             if (subject.teachingTeachers[i].teacherId == teacherDetails[msg.sender].teacherId) {
@@ -191,16 +190,14 @@ contract Attendance {
                 break;
             }
         }
-
         require(isAssigned, "You are not assigned to this subject");
 
         return subject.enrolledStudents;
     }
 
-    function getClassesForSubject(uint256 _subjectId) public view onlyTeacher returns (uint256[] memory) {
+    function getClassesForTeacher(uint256 _subjectId) public view onlyTeacher returns (uint256[] memory) {
         Subject storage subject = subjectDetails[_subjectId];
 
-        // Verify that the teacher is assigned to this subject
         bool isAssigned = false;
         for (uint256 i = 0; i < subject.teachingTeachers.length; i++) {
             if (subject.teachingTeachers[i].teacherId == teacherDetails[msg.sender].teacherId) {
@@ -208,10 +205,43 @@ contract Attendance {
                 break;
             }
         }
-
         require(isAssigned, "You are not assigned to this subject");
 
         return subject.classIds;
+    }
+
+    function getClassesForStudent(uint256 _subjectId) public view returns (uint256[] memory) {
+        return subjectDetails[_subjectId].classIds;
+    }
+    
+    function getSubjectsForStudent() public view returns (uint256[] memory) {
+        uint256 totalSubjects = subjectCounter;
+        uint256 count = 0;
+
+        for (uint256 i = 1; i <= totalSubjects; i++) {
+            Subject storage subject = subjectDetails[i];
+            for (uint256 j = 0; j < subject.enrolledStudents.length; j++) {
+                if (subject.enrolledStudents[j].studentId == studentDetails[msg.sender].studentId) {
+                    count++;
+                    break;
+                }
+            }
+        }
+
+        uint256[] memory enrolledSubjectIds = new uint256[](count);
+        uint256 index = 0;
+
+        for (uint256 i = 1; i <= totalSubjects; i++) {
+            Subject storage subject = subjectDetails[i];
+            for (uint256 j = 0; j < subject.enrolledStudents.length; j++) {
+                if (subject.enrolledStudents[j].studentId == studentDetails[msg.sender].studentId) {
+                    enrolledSubjectIds[index] = i;
+                    index++;
+                    break;
+                }
+            }
+        }
+        return enrolledSubjectIds;
     }
 
     function removeStudent(address _student) public onlyAdmin {
