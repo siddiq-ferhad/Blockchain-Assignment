@@ -22,6 +22,7 @@ const AdminPage = ({ contract, accounts }) => {
   const [searchedTeacher, setSearchedTeacher] = useState(null);
   const [searchSubjectId, setSearchSubjectId] = useState("");
   const [searchedSubject, setSearchedSubject] = useState(null);
+  const [attendanceHistory, setAttendanceHistory] = useState([]);
 
   const addStudent = async () => {
     if (!studentName || !studentAddress) {
@@ -309,6 +310,28 @@ const AdminPage = ({ contract, accounts }) => {
       console.error("Error viewing classes:", error);
     }
   }
+
+  const viewAttendance = async () => {
+    try {
+      const studentAttendance = [];
+      for (let subject of subjects) {
+        for (let classId of subject.classIds) {
+          const isAttended = await contract.methods
+            .checkAttendance(classId)
+            .call({ from: accounts[0] });
+          studentAttendance.push({
+            classId,
+            subjectName: subject.subjectName,
+            attended: isAttended,
+          });
+        }
+      }
+      setAttendanceHistory(studentAttendance);
+    } catch (error) {
+      console.error("Error fetching attendance history:", error);
+      alert("Failed to fetch attendance history.");
+    }
+  };
 
   return (
     <div className="App">
