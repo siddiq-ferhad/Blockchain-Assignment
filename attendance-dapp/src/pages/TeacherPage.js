@@ -72,7 +72,7 @@ const TeacherPage = ({ contract, accounts }) => {
         classDetailsList.push({
           classId: id,
           subjectName: subjectDetails.subjectName,
-          classDate: new Date(parseInt(classDetails.classDate) * 1000).toLocaleDateString(),
+          classDate: new Date(parseInt(classDetails.classDate) * 1000).toLocaleString(),
           classPwd: classDetails.classPwd,
         });
       }
@@ -138,7 +138,7 @@ const TeacherPage = ({ contract, accounts }) => {
             <li key={index} className="list-item">
               <span><strong>Class ID:</strong> {classInfo.classId}</span><br />
               <span><strong>Subject Name:</strong> {classInfo.subjectName}</span><br />
-              <span><strong>Class Date:</strong> {classInfo.classDate}</span><br />
+              <span><strong>Class Date-Time:</strong> {classInfo.classDate}</span><br />
               <span><strong>Class Password:</strong> {classInfo.classPwd}</span>
               <button className="inviso"></button>
             </li>
