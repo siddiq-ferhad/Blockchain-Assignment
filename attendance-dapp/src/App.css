@@ -86,6 +86,14 @@ button:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.attendance-section2 {
+  flex: 0.7; 
+  padding: 15px;
+  background: #f7f7f7;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 ul {
   list-style-type: none;
   padding: 0;
@@ -137,6 +145,20 @@ ul li span {
   margin-right: 10px;
   width: 26px;
   height: 26px;
+  padding: 0;
+  text-align: center;
+  line-height: 20px;
+  font-size: 18px;
+  background-color: #ffffff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.inviso2 {
+  margin-right: 10px;
+  width: 26px;
+  height: 15px;
   padding: 0;
   text-align: center;
   line-height: 20px;
