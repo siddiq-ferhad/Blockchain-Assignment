@@ -10,7 +10,7 @@ const AdminPage = ({ contract, accounts }) => {
   const [studentAddress, setStudentAddress] = useState("");
   const [teacherAddress, setTeacherAddress] = useState("");
   const [subjectName, setSubjectName] = useState("");
-  const [classDate, setClassDate] = useState("");
+  const [classDateTime, setClassDateTime] = useState("");
   const [subjectId, setSubjectId] = useState("");
   const [assignTeacherSubjectId, setAssignTeacherSubjectId] = useState("");
   const [assignTeacherAddress, setAssignTeacherAddress] = useState("");
@@ -84,27 +84,32 @@ const AdminPage = ({ contract, accounts }) => {
   };
 
   const addClass = async () => {
-    if (!classDate || !subjectId) {
-      alert("Please enter both the class date and subject ID.");
+    if (!classDateTime || !subjectId) {
+      alert("Please enter both the class date and time and subject ID.");
       return;
     }
-
+  
     try {
-      const timestamp = new Date(classDate).getTime() / 1000; // Convert date to UNIX timestamp
+      const timestamp = new Date(classDateTime).getTime() / 1000; // Convert date-time to UNIX timestamp
       const subject = await contract.methods.subjectDetails(subjectId).call();
       const subjectName = subject.subjectName;
-
+  
+      const formattedDateTime = new Date(classDateTime).toLocaleString("en-US", {
+        dateStyle: "long",
+        timeStyle: "short",
+      });
+  
       await contract.methods
         .createClass(timestamp, subjectId)
         .send({ from: accounts[0] });
-      alert(`Class for ${subjectName} on ${classDate} added successfully!`);
-      setClassDate("");
+      alert(`Class for ${subjectName} on ${formattedDateTime} added successfully!`);
+      setClassDateTime("");
       setSubjectId("");
     } catch (error) {
       console.error("Error adding class:", error);
       alert("Failed to add class.");
     }
-  };
+  };  
 
   const removeStudent = async (address) => {
     try {
@@ -381,15 +386,15 @@ const AdminPage = ({ contract, accounts }) => {
       <div className="section">
         <h2>Add a New Class</h2>
         <input
-          type="date"
-          value={classDate}
-          onChange={(e) => setClassDate(e.target.value)}
-        />
-        <input
           type="number"
           placeholder="Subject ID"
           value={subjectId}
           onChange={(e) => setSubjectId(e.target.value)}
+        />
+        <input
+          type="datetime-local"
+          value={classDateTime}
+          onChange={(e) => setClassDateTime(e.target.value)}
         />
         <button onClick={addClass}>Add Class</button>
       </div>
