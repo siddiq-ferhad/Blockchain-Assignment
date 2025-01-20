@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const StudentPage = ({ contract, accounts }) => {
   const [classId, setClassId] = useState("");
   const [password, setPassword] = useState("");
   const [enrolledSubjects, setEnrolledSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
-  const [enrolledClasses] = useState([]);
+  const [enrolledClasses, setEnrolledClasses] = useState([]);
   const [attendanceHistory, setAttendanceHistory] = useState([]);
 
-  // Function to mark attendance
+  useEffect(() => {
+    viewEnrolledSubjects();
+  },);
+
   const markAttendance = async () => {
     if (!classId || !password) {
       alert("Please provide both Class ID and Password.");
@@ -29,8 +32,12 @@ const StudentPage = ({ contract, accounts }) => {
     }
   };
 
-  // Function to check attendance
   const viewAttendance = async () => {
+    if (enrolledClasses.length === 0) {
+      alert("Please view your subjects first.");
+      return;
+    }
+
     try {
       const studentAttendance = [];
       for (let enrolledClass of enrolledClasses) {
@@ -38,10 +45,16 @@ const StudentPage = ({ contract, accounts }) => {
           .checkAttendance(enrolledClass.classId)
           .call({ from: accounts[0] });
 
+        console.log("Raw classDate:", enrolledClass.classDate);
+
+        const classDate = new Date(enrolledClass.classDate);
+        const formattedDate = classDate.toLocaleString();
+
         studentAttendance.push({
           classId: enrolledClass.classId,
           subjectName: enrolledClass.subjectName,
           attended: isAttended,
+          classDate: formattedDate,
         });
       }
       setAttendanceHistory(studentAttendance);
@@ -56,12 +69,29 @@ const StudentPage = ({ contract, accounts }) => {
       const subjectIds = await contract.methods.getSubjectsForStudent().call({ from: accounts[0] });
 
       const subjects = [];
+      const classesForSubjects = [];
       for (const subjectId of subjectIds) {
         const subject = await contract.methods.subjectDetails(subjectId).call();
         subjects.push(subject);
+
+        const classIds = await contract.methods.getClassesForStudent(subjectId).call({ from: accounts[0] });
+        const classDetailsList = [];
+        for (const id of classIds) {
+          const classDetails = await contract.methods.classDetails(id).call();
+          const classDate = new Date(parseInt(classDetails.classDate) * 1000);
+          const formattedDate = classDate.toLocaleString();
+
+          classDetailsList.push({
+            classId: id,
+            subjectName: subject.subjectName,
+            classDate: formattedDate,
+          });
+        }
+        classesForSubjects.push(...classDetailsList);
       }
 
       setEnrolledSubjects(subjects);
+      setEnrolledClasses(classesForSubjects);
     } catch (error) {
       console.error("Error viewing enrolled subjects:", error);
     }
@@ -76,10 +106,13 @@ const StudentPage = ({ contract, accounts }) => {
         const classDetails = await contract.methods.classDetails(id).call();
         const subjectDetails = await contract.methods.subjectDetails(subjectId).call();
 
+        const classDate = new Date(parseInt(classDetails.classDate) * 1000);
+        const formattedDate = classDate.toLocaleString();
+
         classDetailsList.push({
           classId: id,
           subjectName: subjectDetails.subjectName,
-          classDate: new Date(parseInt(classDetails.classDate) * 1000).toLocaleDateString(),
+          classDate: formattedDate,
         });
       }
 
@@ -94,7 +127,7 @@ const StudentPage = ({ contract, accounts }) => {
     <div className="App">
       <h2>Welcome Student!</h2>
       <div className="lists-container">
-        <div className="attendance-section">
+        <div className="attendance-section2">
           <h3>Mark Attendance</h3>
           <input
             type="text"
@@ -116,9 +149,9 @@ const StudentPage = ({ contract, accounts }) => {
           <button onClick={viewAttendance}>View Attendance</button>
           <ul>
             {attendanceHistory.map((entry, index) => (
-              <li key={index}>
-                {`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${entry.attended ? "Present" : "Absent"
-                  }`}
+              <li key={index} className="list-item">
+                <span>{`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${entry.classDate} - ${entry.attended ? "Present" : "Absent"}`}</span>
+                <button className="inviso2"></button>
               </li>
             ))}
           </ul>
@@ -128,7 +161,6 @@ const StudentPage = ({ contract, accounts }) => {
       <div className="lists-container">
         <div className="enrolled-subjects">
           <h3>Your Enrolled Subjects</h3>
-          <button onClick={viewEnrolledSubjects}>View Subjects</button>
           <ul>
             {enrolledSubjects.map((subject, index) => (
               <li key={index} className="list-item">
