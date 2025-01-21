@@ -15,11 +15,13 @@ contract Attendance {
     struct Student {
         uint256 studentId;
         string name;
+        address studentAddress;
     }
 
     struct Teacher {
         uint256 teacherId;
         string name;
+        address teacherAddress;
     }
 
     struct Subject {
@@ -96,8 +98,8 @@ contract Attendance {
 
     function addStudent(address _student, string memory _name) public onlyAdmin {
         studentCounter++;
-        studentDetails[_student] = Student(studentCounter, _name);
-        students.push(Student(studentCounter, _name));
+        studentDetails[_student] = Student(studentCounter, _name, _student);
+        students.push(Student(studentCounter, _name, _student));
         assignRole(_student, "student");
 
         emit studentAdded(_student, _name);
@@ -105,8 +107,8 @@ contract Attendance {
 
     function addTeacher(address _teacher, string memory _name) public onlyAdmin {
         teacherCounter++;
-        teacherDetails[_teacher] = Teacher(teacherCounter,_name);
-        teachers.push(Teacher(teacherCounter, _name));
+        teacherDetails[_teacher] = Teacher(teacherCounter,_name, _teacher);
+        teachers.push(Teacher(teacherCounter, _name, _teacher));
         assignRole(_teacher, "teacher");
 
         emit teacherAdded(_teacher, _name);

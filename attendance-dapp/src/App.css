@@ -1,20 +1,140 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
 
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #f7f7f7;
+  --hover-color: #0056b3;
+  --danger-color: #f44336;
+  --danger-hover-color: #d32f2f;
+  --font-family: 'Poppins', sans-serif;
+}
+
+.header {
+  background-color: #265180;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid var(--hover-color);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2em;
+  font-weight: 700;
+}
+
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-family);
   background-color: #f9f9f9;
   color: #333;
   margin: 0;
   padding: 0;
+  margin-bottom: 80px;
 }
 
-.App {
-  max-width: 1200px;
-  margin: 20px auto;
+/* AdminPage Sidebar Styles */
+.AdminPage .sidebar {
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #242323;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+/* When the sidebar is hidden */
+.AdminPage .sidebar.collapsed {
+  width: 0;
+  padding-top: 0;
+}
+
+.AdminPage .sidebar h2 {
+  font-size: 18px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+  transition: opacity 0.3s ease;
+}
+
+.AdminPage .sidebar.collapsed h2 {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.AdminPage .sidebar a {
+  padding: 10px 15px;
+  text-decoration: none;
+  font-size: 18px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.AdminPage .sidebar a:hover {
+  color: #f1f1f1;
+}
+
+.AdminPage .sidebar.collapsed a {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.AdminPage .toggle-btn {
+  position: fixed; /* Change to fixed to ensure it's always visible */
+  top: 10px;
+  left: 10px; /* Adjust position to ensure it's visible */
+  width: 30px;
+  height: 30px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  z-index: 1000; /* Ensure the button is above other elements */
+}
+
+.AdminPage .toggle-btn:hover {
+  background-color: var(--hover-color);
+}
+
+/* Ensure the button is visible even when the sidebar is collapsed */
+.AdminPage .sidebar.collapsed + .toggle-btn {
+  transform: rotate(180deg); /* Optional: Rotate the button to indicate the sidebar can be expanded */
+}
+
+.AdminPage .main-content {
+  margin-left: 200px; /* Adjust this value to reduce the push */
+  transition: margin-left 0.5s;
+  padding: 16px;
+}
+
+.AdminPage .main-content.expanded {
+  margin-left: 0;
+}
+
+.AdminPage .App {
+  max-width: calc(100% - 200px); 
+  margin-left: 200px; 
   padding: 20px;
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: margin-left 0.3s ease;
+}
+
+.AdminPage .App.collapsed {
+  max-width: 100%;
+  margin-left: 0;
 }
 
 h1 {
@@ -30,12 +150,12 @@ input, button {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-family);
   box-sizing: border-box;
 }
 
 button {
-  background-color: #007bff;
+  background-color: var(--primary-color);
   color: #fff;
   border: none;
   cursor: pointer;
@@ -43,7 +163,12 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: var(--hover-color);
+}
+
+button:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
 }
 
 .lists-container {
@@ -53,6 +178,25 @@ button:hover {
   margin-top: 20px;
 }
 
+.search-and-lists-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.search-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lists-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .students-list,
 .teachers-list,
 .subjects-list,
@@ -60,7 +204,7 @@ button:hover {
 .generate-password,
 .attendance-section {
   flex: 1;
-  background: #f7f7f7;
+  background: var(--secondary-color);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -71,7 +215,7 @@ button:hover {
 .search-teacher,
 .search-subject {
   flex: 1;
-  background: #f7f7f7;
+  background: var(--secondary-color);
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -81,7 +225,7 @@ button:hover {
 .enrolled-subjects {
   flex: 0.5; 
   padding: 15px;
-  background: #f7f7f7;
+  background: var(--secondary-color);
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -89,7 +233,7 @@ button:hover {
 .attendance-section2 {
   flex: 0.7; 
   padding: 15px;
-  background: #f7f7f7;
+  background: var(--secondary-color);
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -119,26 +263,28 @@ ul li span {
 
 .list-item {
   display: flex;
-  align-items: center; /* Aligns the text and button vertically */
+  align-items: center; 
   justify-content: space-between;
 }
 
 .remove-btn {
-  margin-right: 10px; /* Adds space between the name and the button */
-  width: 26px; /* Set the width of the button */
-  height: 26px; /* Set the height of the button */
-  padding: 0; /* Remove any default padding */
-  text-align: center; /* Centers the text inside the button */
-  line-height: 20px; /* Vertically centers the text inside the button */
-  font-size: 18px; /* Adjust font size to fit */
-  background-color: #f44336; /* Red background color */
-  color: white; /* White text color */
-  border: none; /* Remove border */
+  margin-right: 10px; 
+  width: 26px; 
+  height: 26px; 
+  padding: 0; 
+  text-align: center; 
+  line-height: 20px; 
+  font-size: 18px; 
+  background-color: var(--danger-color); 
+  color: white; 
+  border: none; 
   border-radius: 4px; /* Optional: Rounded corners */
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .remove-btn:hover {
-  background-color: #d32f2f; /* Darker red on hover */
+  background-color: var(--danger-hover-color); 
+  transform: scale(1.1);
 }
 
 .inviso {
@@ -190,7 +336,7 @@ ul li span {
   font-size: 14px;
   width: auto;
   height: auto;
-  background-color: #007bff;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 5px;
@@ -199,11 +345,24 @@ ul li span {
 }
 
 .view-classes-btn:hover {
-  background-color: #0056b3;
+  background-color: var(--hover-color);
 }
 
 @media (max-width: 768px) {
   .lists-container {
     flex-direction: column;
+  }
+
+  .search-and-lists-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    width: 60px;
+  }
+
+  .App {
+    margin-left: 80px;
+    max-width: calc(100% - 80px);
   }
 }
