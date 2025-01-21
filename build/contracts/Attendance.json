@@ -30904,12 +30904,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xd9a2F60dd6b4E255eD8a59031EFcEA7a49B6B187",
-      "transactionHash": "0xff335f2b2f5d04a5c659306f343da05db4302109335050c1e87a67f7beb48992"
+      "address": "0x74B6B7dB2D339DeFC41349e2B84C5c442BB503ce",
+      "transactionHash": "0x2664f24dd4b10c41638f9b649b8b28bcb85971588c0a354bd6ec84a2015b65c5"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2025-01-21T11:33:47.521Z",
+  "updatedAt": "2025-01-21T15:53:39.240Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

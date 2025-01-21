@@ -150,8 +150,12 @@ const StudentPage = ({ contract, accounts }) => {
           <ul>
             {attendanceHistory.map((entry, index) => (
               <li key={index} className="list-item">
-                <span>{`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${entry.classDate} - ${entry.attended ? "Present" : "Absent"}`}</span>
-                <button className="inviso2"></button>
+                <span>{`Class ID: ${entry.classId} - Subject: ${entry.subjectName} - ${entry.classDate}`}</span>
+                <button
+                  className={`attendance-status-btn ${entry.attended ? "btn-green" : "btn-red"}`}
+                >
+                  {entry.attended ? "Present" : "Absent"}
+                </button>
               </li>
             ))}
           </ul>
