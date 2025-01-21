@@ -29,13 +29,14 @@ const TeacherPage = ({ contract, accounts }) => {
         alert("Please enter Class ID.");
         return;
       }
-
+  
       await contract.methods.generateClassPwd(classId).send({ from: accounts[0] });
       const classDetails = await contract.methods.classDetails(classId).call();
       const generatedPassword = classDetails.classPwd;
-
-      setGeneratedPwd(generatedPassword);
-
+      const passwordExpiry = new Date(parseInt(classDetails.passwordExpiry) * 1000).toLocaleTimeString();
+  
+      setGeneratedPwd(`${generatedPassword} (Valid until: ${passwordExpiry})`);
+  
       // Create a hidden textarea element to copy the password to the clipboard
       const textArea = document.createElement('textarea');
       textArea.value = generatedPassword;
@@ -47,13 +48,13 @@ const TeacherPage = ({ contract, accounts }) => {
 
       // Remove the textarea from the DOM
       document.body.removeChild(textArea);
-      alert("Password copied to clipboard!");
-
+  
+      alert("Password copied to clipboard and valid for 30 seconds!");
     } catch (error) {
       console.error("Error generating class password:", error);
       alert("Failed to generate class password. Please check the inputs.");
     }
-  };
+  };  
 
   const viewClasses = async () => {
     try {
