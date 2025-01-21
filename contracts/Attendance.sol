@@ -37,6 +37,7 @@ contract Attendance {
         uint256 classId;
         uint256 classDate;
         string classPwd;
+        uint256 passwordExpiry; // Expiration timestamp for the password
         mapping(address => bool) attendance;
     }
 
@@ -154,8 +155,9 @@ contract Attendance {
     function markAttendance(uint256 _classId, string memory _pwd) public onlyEnrolledStudent(classDetails[_classId].classId) {
         require(classDetails[_classId].attendance[msg.sender] == false, "Attendance already marked");
         require(keccak256(abi.encodePacked(classDetails[_classId].classPwd)) == keccak256(abi.encodePacked(_pwd)), "Invalid password");
-        classDetails[_classId].attendance[msg.sender] = true;
+        require(block.timestamp <= classDetails[_classId].passwordExpiry, "Password expired"); // Check password expiration
 
+        classDetails[_classId].attendance[msg.sender] = true;
         emit attendanceMarked(_classId, msg.sender);
     }
 
@@ -170,6 +172,7 @@ contract Attendance {
     function generateClassPwd(uint256 _classId) public onlyTeacher {
         string memory classPwd = getRandomPassword();
         classDetails[_classId].classPwd = classPwd;
+        classDetails[_classId].passwordExpiry = block.timestamp + 30; // Set expiration time to 30 seconds from now
     }
 
     function getRandomPassword() public view returns (string memory) {
