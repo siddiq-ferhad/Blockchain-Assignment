@@ -7,6 +7,9 @@ const TeacherPage = ({ contract, accounts }) => {
   const [enrollSubjectId, enrollSetSubjectId] = useState("");
   const [classSubjectId, classSetSubjectId] = useState("");
   const [generatedPwd, setGeneratedPwd] = useState("");
+  const [attendanceStatus, setAttendanceStatus] = useState(null);
+  const [studentAddress, setStudentAddress] = useState("");
+  const [classAttendanceId, classSetAttendanceId] = useState("");
 
   const viewEnrolledStudents = async (subjectId) => {
     try {
@@ -29,14 +32,14 @@ const TeacherPage = ({ contract, accounts }) => {
         alert("Please enter Class ID.");
         return;
       }
-  
+
       await contract.methods.generateClassPwd(classId).send({ from: accounts[0] });
       const classDetails = await contract.methods.classDetails(classId).call();
       const generatedPassword = classDetails.classPwd;
       const passwordExpiry = new Date(parseInt(classDetails.passwordExpiry) * 1000).toLocaleTimeString();
-  
+
       setGeneratedPwd(`${generatedPassword} (Valid until: ${passwordExpiry})`);
-  
+
       // Create a hidden textarea element to copy the password to the clipboard
       const textArea = document.createElement('textarea');
       textArea.value = generatedPassword;
@@ -48,13 +51,13 @@ const TeacherPage = ({ contract, accounts }) => {
 
       // Remove the textarea from the DOM
       document.body.removeChild(textArea);
-  
+
       alert("Password copied to clipboard and valid for 30 seconds!");
     } catch (error) {
       console.error("Error generating class password:", error);
       alert("Failed to generate class password. Please check the inputs.");
     }
-  };  
+  };
 
   const viewClasses = async () => {
     try {
@@ -82,6 +85,21 @@ const TeacherPage = ({ contract, accounts }) => {
     } catch (error) {
       console.error("Error fetching classes:", error);
       alert("Failed to fetch classes. Please check the inputs or your permissions.");
+    }
+  };
+
+  const checkAttendance = async () => {
+    try {
+      if (!classAttendanceId || !studentAddress) {
+        alert("Please enter both Class ID and Student Address.");
+        return;
+      }
+
+      const attendance = await contract.methods.checkAttendance(classAttendanceId, studentAddress).call({ from: accounts[0] });
+      setAttendanceStatus(attendance ? "Present" : "Absent");
+    } catch (error) {
+      console.error("Error checking attendance:", error);
+      alert("Failed to check attendance. Please ensure the inputs are correct.");
     }
   };
 
@@ -125,26 +143,50 @@ const TeacherPage = ({ contract, accounts }) => {
         </div>
       </div>
 
-      <div className="class-list">
-        <h3>Classes</h3>
-        <input
-          type="text"
-          placeholder="Subject ID"
-          value={classSubjectId}
-          onChange={(e) => classSetSubjectId(e.target.value)}
-        />
-        <button onClick={viewClasses}>View Classes</button>
-        <ul>
-          {classes.map((classInfo, index) => (
-            <li key={index} className="list-item">
-              <span><strong>Class ID:</strong> {classInfo.classId}</span><br />
-              <span><strong>Subject Name:</strong> {classInfo.subjectName}</span><br />
-              <span><strong>Class Date-Time:</strong> {classInfo.classDate}</span><br />
-              <span><strong>Class Password:</strong> {classInfo.classPwd}</span>
-              <button className="inviso"></button>
-            </li>
-          ))}
-        </ul>
+      <div className="lists-container">
+        <div className="class-list">
+          <h3>Classes</h3>
+          <input
+            type="text"
+            placeholder="Subject ID"
+            value={classSubjectId}
+            onChange={(e) => classSetSubjectId(e.target.value)}
+          />
+          <button onClick={viewClasses}>View Classes</button>
+          <ul>
+            {classes.map((classInfo, index) => (
+              <li key={index} className="list-item">
+                <span><strong>Class ID:</strong> {classInfo.classId}</span><br />
+                <span><strong>Subject Name:</strong> {classInfo.subjectName}</span><br />
+                <span><strong>Class Date:</strong> {classInfo.classDate}</span><br />
+                <span><strong>Class Password:</strong> {classInfo.classPwd}</span>
+                <button className="inviso"></button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="check-attendance-section">
+          <h3>Check Attendance</h3>
+          <input
+            type="text"
+            placeholder="Class ID"
+            value={classAttendanceId}
+            onChange={(e) => classSetAttendanceId(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Student Address"
+            value={studentAddress}
+            onChange={(e) => setStudentAddress(e.target.value)}
+          />
+          <button onClick={checkAttendance}>Check Attendance</button>
+          {attendanceStatus && (
+            <p>
+              <strong>Attendance Status:</strong> {attendanceStatus}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

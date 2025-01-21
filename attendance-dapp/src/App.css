@@ -94,6 +94,15 @@ button:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.check-attendance-section {
+  flex: 0.5;
+  background: #f7f7f7;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
@@ -200,6 +209,39 @@ ul li span {
 
 .view-classes-btn:hover {
   background-color: #0056b3;
+}
+
+.attendance-status-btn {
+  margin-right: 7px;
+  margin-top: 7px;
+  margin-bottom: 7px;
+  padding: 3px 10px;
+  font-size: 14px;
+  width: auto;
+  height: auto;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.btn-green {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: #4CAF50;
+  cursor: auto;
+}
+
+.btn-red {
+  background-color: #F44336;
+  color: white;
+}
+
+.btn-red:hover {
+  background-color: #F44336;
+  cursor: auto;
 }
 
 @media (max-width: 768px) {
