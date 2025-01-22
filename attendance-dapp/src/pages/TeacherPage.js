@@ -104,7 +104,7 @@ const TeacherPage = ({ contract, accounts }) => {
   };
 
   return (
-    <div className="App">
+    <div className="App2">
       <h2>Welcome Teacher!</h2>
       <div className="lists-container">
         <div className="generate-password">

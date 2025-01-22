@@ -124,7 +124,7 @@ const StudentPage = ({ contract, accounts }) => {
   };
 
   return (
-    <div className="App">
+    <div className="App2">
       <h2>Welcome Student!</h2>
       <div className="lists-container">
         <div className="attendance-section2">

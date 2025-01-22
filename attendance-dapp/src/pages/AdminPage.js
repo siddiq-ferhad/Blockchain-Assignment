@@ -89,17 +89,17 @@ const AdminPage = ({ contract, accounts }) => {
       alert("Please enter both the class date and time and subject ID.");
       return;
     }
-  
+
     try {
       const timestamp = new Date(classDateTime).getTime() / 1000; // Convert date-time to UNIX timestamp
       const subject = await contract.methods.subjectDetails(subjectId).call();
       const subjectName = subject.subjectName;
-  
+
       const formattedDateTime = new Date(classDateTime).toLocaleString("en-US", {
         dateStyle: "long",
         timeStyle: "short",
       });
-  
+
       await contract.methods
         .createClass(timestamp, subjectId)
         .send({ from: accounts[0] });
@@ -110,7 +110,7 @@ const AdminPage = ({ contract, accounts }) => {
       console.error("Error adding class:", error);
       alert("Failed to add class.");
     }
-  };  
+  };
 
   const removeStudent = async (address) => {
     try {
@@ -318,12 +318,8 @@ const AdminPage = ({ contract, accounts }) => {
 
   return (
     <div className={`AdminPage App ${isSidebarCollapsed ? "collapsed" : ""}`}>
-      <header className="header">
-        <h1>Attendance DApp</h1>
-      </header>
-  
       <button className="toggle-btn" onClick={toggleSidebar}>&#9776;</button>
-  
+
       <aside className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}>
         <h2>Navigation</h2>
         <a href="#student" onClick={() => setSelectedSection("student")}>Student</a>
@@ -331,11 +327,14 @@ const AdminPage = ({ contract, accounts }) => {
         <a href="#subject" onClick={() => setSelectedSection("subject")}>Subject</a>
         <a href="#class" onClick={() => setSelectedSection("class")}>Class</a>
       </aside>
-  
+
       <main className={`main-content ${isSidebarCollapsed ? "expanded" : ""}`}>
         {selectedSection === "student" && (
           <div id="student">
             <div id="add-student" className="section">
+              <header className="header">
+                <h1>Attendance DApp</h1>
+              </header>
               <h2>Add a New Student</h2>
               <input
                 type="text"
@@ -398,10 +397,13 @@ const AdminPage = ({ contract, accounts }) => {
             </div>
           </div>
         )}
-  
+
         {selectedSection === "teacher" && (
           <div id="teacher">
             <div id="add-teacher" className="section">
+              <header className="header">
+                <h1>Attendance DApp</h1>
+              </header>
               <h2>Add a New Teacher</h2>
               <input
                 type="text"
@@ -464,10 +466,13 @@ const AdminPage = ({ contract, accounts }) => {
             </div>
           </div>
         )}
-  
+
         {selectedSection === "subject" && (
           <div id="subject">
             <div id="add-subject" className="section">
+              <header className="header">
+                <h1>Attendance DApp</h1>
+              </header>
               <h2>Add a New Subject</h2>
               <input
                 type="text"
@@ -508,10 +513,13 @@ const AdminPage = ({ contract, accounts }) => {
             </div>
           </div>
         )}
-  
+
         {selectedSection === "class" && (
           <div id="class">
             <div id="add-class" className="section">
+              <header className="header">
+                <h1>Attendance DApp</h1>
+              </header>
               <h2>Add a New Class</h2>
               <input
                 type="number"
@@ -547,7 +555,7 @@ const AdminPage = ({ contract, accounts }) => {
 
 
 
-  
+
 };
 
 export default AdminPage;
