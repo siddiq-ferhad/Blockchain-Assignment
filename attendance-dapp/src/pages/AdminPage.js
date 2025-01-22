@@ -258,12 +258,14 @@ const AdminPage = ({ contract, accounts }) => {
 
   const viewStudents = async () => {
     try {
-      const studentCount = await contract.methods.studentCounter().call();
+      const length = await contract.methods.getStudentCount().call();
       const viewedStudents = [];
-      for (let i = 1; i <= studentCount; i++) {
-        const student = await contract.methods.students(i - 1).call();
+
+      for (let i = 0; i < length; i++) {
+        const student = await contract.methods.students(i).call();
         viewedStudents.push(student);
       }
+
       setStudents(viewedStudents);
     } catch (error) {
       console.error("Error viewing students:", error);
@@ -272,12 +274,14 @@ const AdminPage = ({ contract, accounts }) => {
 
   const viewTeachers = async () => {
     try {
-      const teacherCount = await contract.methods.teacherCounter().call();
+      const length = await contract.methods.getTeacherCount().call();
       const viewedTeachers = [];
-      for (let i = 1; i <= teacherCount; i++) {
-        const teacher = await contract.methods.teachers(i - 1).call();
+
+      for (let i = 0; i < length; i++) {
+        const teacher = await contract.methods.teachers(i).call();
         viewedTeachers.push(teacher);
       }
+
       setTeachers(viewedTeachers);
     } catch (error) {
       console.error("Error viewing teachers:", error);
@@ -288,10 +292,15 @@ const AdminPage = ({ contract, accounts }) => {
     try {
       const subjectCount = await contract.methods.subjectCounter().call();
       const viewedSubjects = [];
+
       for (let i = 1; i <= subjectCount; i++) {
         const subject = await contract.methods.subjectDetails(i).call();
-        viewedSubjects.push(subject);
+
+        if (parseInt(subject.subjectId) !== 0) {
+          viewedSubjects.push(subject);
+        }
       }
+
       setSubjects(viewedSubjects);
     } catch (error) {
       console.error("Error viewing subjects:", error);
@@ -390,7 +399,7 @@ const AdminPage = ({ contract, accounts }) => {
                 {students.map((student, index) => (
                   <li key={index} className="list-item">
                     <span>{`${student.studentId}: ${student.name} - ${student.studentAddress}`}</span>
-                    <button onClick={() => removeStudent(student.address)} className="remove-btn">X</button>
+                    <button onClick={() => removeStudent(student.studentAddress)} className="remove-btn">X</button>
                   </li>
                 ))}
               </ul>
@@ -459,7 +468,7 @@ const AdminPage = ({ contract, accounts }) => {
                 {teachers.map((teacher, index) => (
                   <li key={index} className="list-item">
                     <span>{`${teacher.teacherId}: ${teacher.name} - ${teacher.teacherAddress}`}</span>
-                    <button onClick={() => removeTeacher(teacher.address)} className="remove-btn">X</button>
+                    <button onClick={() => removeTeacher(teacher.teacherAddress)} className="remove-btn">X</button>
                   </li>
                 ))}
               </ul>
