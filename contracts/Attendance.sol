@@ -255,10 +255,26 @@ contract Attendance {
 
     function removeStudent(address _student) public onlyAdmin {
         delete studentDetails[_student];
+        uint256 length = students.length;
+        for (uint256 i = 0; i < length; i++) {
+            if (students[i].studentAddress == _student) {
+                students[i] = students[length - 1];
+                students.pop();
+                break;
+            }
+        }
     }
 
     function removeTeacher(address _teacher) public onlyAdmin {
         delete teacherDetails[_teacher];
+        uint256 length = teachers.length;
+        for (uint256 i = 0; i < length; i++) {
+            if (teachers[i].teacherAddress == _teacher) {
+                teachers[i] = teachers[length - 1];
+                teachers.pop();
+                break;
+            }
+        }
     }
 
     function removeSubject(uint256 _subjectId) public onlyAdmin {
@@ -267,5 +283,13 @@ contract Attendance {
 
     function removeClass(uint256 _classId) public onlyAdmin {
         delete classDetails[_classId];
+    }
+
+    function getStudentCount() public view returns (uint256) {
+        return students.length;
+    }
+
+    function getTeacherCount() public view returns (uint256) {
+        return teachers.length;
     }
 }
