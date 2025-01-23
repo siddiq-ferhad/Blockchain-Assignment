@@ -263,6 +263,7 @@ contract Attendance {
                 break;
             }
         }
+        roles[_student] = "";
     }
 
     function removeTeacher(address _teacher) public onlyAdmin {
@@ -275,6 +276,7 @@ contract Attendance {
                 break;
             }
         }
+        roles[_teacher] = "";
     }
 
     function removeSubject(uint256 _subjectId) public onlyAdmin {
