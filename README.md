@@ -47,7 +47,7 @@ Opens the Truffle interactive console for testing contract interactions.
 ### Step 1: Clone the Repository
 
 ```sh
-git clone https://github.com/your-repo/attendance-dapp.git
+git clone https://github.com/siddiq-ferhad/Blockchain-Assignment.git
 cd attendance-dapp
 ```
 
@@ -60,7 +60,7 @@ npm install
 ### Step 3: Start Ganache
 
 - Open Ganache and create a new workspace
-- Configure the network to `http://127.0.0.1:7545`
+- Configure the network to `http://127.0.0.1:8545`
 
 ### Step 4: Compile and Deploy the Smart Contracts
 
@@ -80,7 +80,7 @@ npm start
 1. Open MetaMask and create/import an account.
 2. Connect MetaMask to the local blockchain:
    - Network: `Custom RPC`
-   - RPC URL: `http://127.0.0.1:7545`
+   - RPC URL: `http://127.0.0.1:8545`
    - Chain ID: `1337` (or default Ganache ID)
 
 ## Troubleshooting
